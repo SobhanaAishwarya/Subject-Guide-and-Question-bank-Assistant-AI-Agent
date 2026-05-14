@@ -11,7 +11,6 @@ def get_llm():
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
-    # IMPORTANT: use text-generation (Streamlit compatible)
     pipe = pipeline(
         "text-generation",
         model=model,
@@ -43,7 +42,7 @@ def generate_answer(query, vectorstore):
     prompt = f"""
 You are a computer science academic assistant.
 
-Use the context below to answer the question clearly:
+Use the context below to answer clearly in this format:
 
 1. Definition
 2. Explanation
@@ -59,10 +58,11 @@ Question:
 Answer:
 """
 
-    # generate response
-    result = llm(prompt)
+    # generate response (FIXED INDENTATION)
+    result = llm.invoke(prompt)
 
     # safe return handling
     if hasattr(result, "content"):
         return result.content
+
     return result
