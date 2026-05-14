@@ -1,17 +1,26 @@
 from langchain_community.llms import HuggingFacePipeline
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
+
 
 # -------------------------
 # LLM SETUP (CLOUD SAFE)
 # -------------------------
 def get_llm():
+    model_name = "google/flan-t5-base"
+
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+
     pipe = pipeline(
         "text2text-generation",
-        model="google/flan-t5-base",
+        model=model,
+        tokenizer=tokenizer,
         max_length=256,
         do_sample=False
     )
+
     return HuggingFacePipeline(pipeline=pipe)
+
 
 llm = get_llm()
 
@@ -51,7 +60,10 @@ Question:
 Answer:
 """
 
-    # Generate response (IMPORTANT FIX)
-    response = llm(prompt)
+    # Generate response
+    result = llm(prompt)
 
-    return response
+    # Extract clean text safely (important for Streamlit)
+    if hasattr(result, "content"):
+        return result.content
+    return result
