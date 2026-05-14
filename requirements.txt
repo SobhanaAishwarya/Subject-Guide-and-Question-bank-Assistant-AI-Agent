@@ -1,9 +1,8 @@
 streamlit
-pandas
-numpy
-scikit-learn
 langchain
-faiss-cpu
-PyPDF2
+langchain-community
 sentence-transformers
-google-generativeai
+faiss-cpu
+pypdf
+transformers
+torch
