@@ -1,9 +1,9 @@
-from langchain_community.llms import HuggingFacePipeline
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
+from langchain_community.llms import HuggingFacePipeline
 
 
 # -------------------------
-# LLM SETUP (CLOUD SAFE)
+# LLM SETUP (CLOUD SAFE FIX)
 # -------------------------
 def get_llm():
     model_name = "google/flan-t5-base"
@@ -11,11 +11,12 @@ def get_llm():
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
+    # IMPORTANT: use text-generation (Streamlit compatible)
     pipe = pipeline(
-        "text2text-generation",
+        "text-generation",
         model=model,
         tokenizer=tokenizer,
-        max_length=256,
+        max_new_tokens=256,
         do_sample=False
     )
 
@@ -30,21 +31,19 @@ llm = get_llm()
 # -------------------------
 def generate_answer(query, vectorstore):
 
-    # Retrieve relevant documents
+    # retrieve similar docs
     docs = vectorstore.similarity_search(query, k=8)
-
-    print("Retrieved docs:", len(docs))
 
     if not docs:
         return "No relevant information found in the document."
 
-    # Combine context
+    # build context
     context = "\n\n".join([doc.page_content for doc in docs])
 
     prompt = f"""
 You are a computer science academic assistant.
 
-Use the context below to answer the question in a structured format:
+Use the context below to answer the question clearly:
 
 1. Definition
 2. Explanation
@@ -60,10 +59,10 @@ Question:
 Answer:
 """
 
-    # Generate response
+    # generate response
     result = llm(prompt)
 
-    # Extract clean text safely (important for Streamlit)
+    # safe return handling
     if hasattr(result, "content"):
         return result.content
     return result
