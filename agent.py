@@ -1,9 +1,27 @@
+from langchain.llms import HuggingFacePipeline
+from transformers import pipeline
 
-from langchain_ollama import ChatOllama
+# -------------------------
+# LLM SETUP (CLOUD SAFE)
+# -------------------------
+def get_llm():
+    pipe = pipeline(
+        "text2text-generation",
+        model="google/flan-t5-base",
+        max_length=256,
+        do_sample=False
+    )
+    return HuggingFacePipeline(pipeline=pipe)
 
+llm = get_llm()
+
+
+# -------------------------
+# MAIN FUNCTION
+# -------------------------
 def generate_answer(query, vectorstore):
 
-    # Retrieve similar chunks from vector database
+    # Retrieve relevant documents
     docs = vectorstore.similarity_search(query, k=8)
 
     print("Retrieved docs:", len(docs))
@@ -11,23 +29,13 @@ def generate_answer(query, vectorstore):
     if not docs:
         return "No relevant information found in the document."
 
-    # Combine retrieved text into context
+    # Combine context
     context = "\n\n".join([doc.page_content for doc in docs])
-
-    # Debug print (to check what text is retrieved)
-    print("----- Retrieved Context Preview -----")
-    print(context[:500])   # prints first 500 characters
-    print("------------------------------------")
-
-    # Load local LLM
-    llm = ChatOllama(
-        model="llama3"
-    )
 
     prompt = f"""
 You are a computer science academic assistant.
 
-Use the context below to answer the question in a structured format.
+Use the context below to answer the question in a structured format:
 
 1. Definition
 2. Explanation
@@ -42,7 +50,8 @@ Question:
 
 Answer:
 """
-    # Generate response
-    response = llm.invoke(prompt)
 
-    return response.content
+    # Generate response (IMPORTANT FIX)
+    response = llm(prompt)
+
+    return response
