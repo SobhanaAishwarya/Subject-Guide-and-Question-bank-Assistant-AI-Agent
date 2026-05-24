@@ -84,10 +84,6 @@ Instructions:
 Context:
 {context}
 
-User Question:
-{query}
-
-
 """
 
         result = llm.invoke(prompt)
