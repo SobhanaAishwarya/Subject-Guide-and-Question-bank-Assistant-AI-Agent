@@ -12,15 +12,15 @@ st.set_page_config(
 )
 
 # -----------------------------------
-# PROFESSIONAL CSS
+# PROFESSIONAL LIGHT UI CSS
 # -----------------------------------
 st.markdown("""
 <style>
 
 /* Main App */
 .stApp {
-    background-color: #0f172a;
-    color: white;
+    background-color: #f8fafc;
+    color: #111827;
     font-family: 'Segoe UI', sans-serif;
 }
 
@@ -29,26 +29,25 @@ st.markdown("""
     padding-top: 2rem;
     padding-left: 4rem;
     padding-right: 4rem;
-    padding-bottom: 2rem;
-    max-width: 1250px;
+    max-width: 1200px;
 }
 
 /* Sidebar */
 section[data-testid="stSidebar"] {
-    background-color: #111827;
-    border-right: 1px solid #1e293b;
+    background-color: white;
+    border-right: 1px solid #e5e7eb;
 }
 
 /* Sidebar Text */
 section[data-testid="stSidebar"] * {
-    color: white !important;
+    color: #111827 !important;
 }
 
-/* Title */
+/* Main Title */
 .main-title {
-    font-size: 52px;
+    font-size: 48px;
     font-weight: 700;
-    color: white;
+    color: #111827;
     margin-bottom: 10px;
     line-height: 1.2;
 }
@@ -56,50 +55,46 @@ section[data-testid="stSidebar"] * {
 /* Subtitle */
 .sub-title {
     font-size: 18px;
-    color: #94a3b8;
+    color: #6b7280;
     margin-bottom: 40px;
-    max-width: 900px;
+    max-width: 850px;
 }
 
-/* Upload Box */
+/* File Upload */
 [data-testid="stFileUploader"] {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    padding: 25px;
+    background-color: white;
+    border: 2px dashed #d1d5db;
     border-radius: 18px;
-    margin-top: 10px;
+    padding: 25px;
 }
 
 /* Input Box */
 .stTextInput input {
-    background-color: #111827 !important;
-    color: white !important;
-    border: 1px solid #334155 !important;
+    background-color: white !important;
+    color: #111827 !important;
+    border: 1px solid #d1d5db !important;
     border-radius: 12px !important;
     padding: 14px !important;
 }
 
 /* Buttons */
 .stButton > button {
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    background: #2563eb;
     color: white;
     border: none;
     border-radius: 12px;
     padding: 0.7rem 1rem;
-    font-size: 15px;
     font-weight: 600;
-    transition: 0.3s;
 }
 
 .stButton > button:hover {
-    transform: scale(1.03);
-    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    background: #1d4ed8;
 }
 
 /* Metrics */
 [data-testid="metric-container"] {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: white;
+    border: 1px solid #e5e7eb;
     padding: 18px;
     border-radius: 16px;
 }
@@ -107,41 +102,38 @@ section[data-testid="stSidebar"] * {
 /* User Chat */
 .chat-user {
     background: #2563eb;
+    color: white;
     padding: 16px;
     border-radius: 16px;
-    margin-bottom: 14px;
-    color: white;
-    font-size: 16px;
+    margin-bottom: 15px;
+    margin-left: auto;
     width: fit-content;
     max-width: 75%;
-    margin-left: auto;
-    box-shadow: 0 4px 15px rgba(37,99,235,0.3);
 }
 
-/* AI Chat */
+/* Bot Chat */
 .chat-bot {
-    background: #1e293b;
+    background: white;
+    color: #111827;
     padding: 18px;
     border-radius: 16px;
     margin-bottom: 20px;
-    color: white;
-    font-size: 16px;
+    border: 1px solid #e5e7eb;
     width: fit-content;
     max-width: 80%;
-    border: 1px solid rgba(255,255,255,0.08);
 }
 
 /* Horizontal Line */
 hr {
-    border: 1px solid #1e293b;
+    border: 1px solid #e5e7eb;
 }
 
 /* Hide Streamlit Branding */
-header {
+footer {
     visibility: hidden;
 }
 
-footer {
+header {
     visibility: hidden;
 }
 
@@ -162,7 +154,7 @@ with st.sidebar:
 
     - PDF/DOCX Question Answering
     - Semantic Search
-    - AI Generated Answers
+    - AI Generated Responses
     - RAG Architecture
     - Academic Assistance
     - Question Bank Support
@@ -170,7 +162,7 @@ with st.sidebar:
 
     st.markdown("---")
 
-    st.info("Upload academic material and start asking questions.")
+    st.info("Upload academic material and ask questions.")
 
 # -----------------------------------
 # MAIN TITLE
@@ -248,18 +240,24 @@ if uploaded_file:
 
     with q1:
         if st.button("Important Topics"):
-            st.session_state.quick_question = "What are the important topics in this document?"
+            st.session_state.quick_question = (
+                "What are the important topics in this document?"
+            )
 
     with q2:
         if st.button("Document Summary"):
-            st.session_state.quick_question = "Give a summary of this document."
+            st.session_state.quick_question = (
+                "Give a summary of this document."
+            )
 
     with q3:
         if st.button("Viva Questions"):
-            st.session_state.quick_question = "Generate important viva questions from this document."
+            st.session_state.quick_question = (
+                "Generate important viva questions from this document."
+            )
 
     # -----------------------------------
-    # USER QUERY
+    # USER INPUT
     # -----------------------------------
     default_question = st.session_state.get("quick_question", "")
 
@@ -270,7 +268,7 @@ if uploaded_file:
     )
 
     # -----------------------------------
-    # GENERATE RESPONSE
+    # GENERATE ANSWER
     # -----------------------------------
     if query:
 
@@ -321,7 +319,8 @@ st.markdown("---")
 st.markdown("""
 <center>
 
-Built using Python, Streamlit, LangChain, HuggingFace, FAISS and RAG Architecture
+Built using Python, Streamlit, LangChain, HuggingFace,
+ChromaDB and RAG Architecture
 
 </center>
 """, unsafe_allow_html=True)
