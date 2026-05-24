@@ -70,10 +70,9 @@ FINAL ANSWER:
 """
        # generate response (FIXED INDENTATION)
     result = llm.invoke(prompt)
-
+    result = result.replace("<div>", "").replace("</div>", "")
     # safe return handling
     if hasattr(result, "content"):
         return result.content
 
     return result
-result = result.replace("<div>", "").replace("</div>", "")
