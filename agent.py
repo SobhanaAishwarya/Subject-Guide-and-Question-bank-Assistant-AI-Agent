@@ -40,25 +40,35 @@ def generate_answer(query, vectorstore):
     context = "\n\n".join([doc.page_content for doc in docs])
 
     prompt = f"""
-You are a computer science academic assistant.
+You are an expert computer science academic assistant.
 
-Use the context below to answer clearly in this format:
+Use ONLY the context below to answer the question.
 
-1. Definition
-2. Explanation
-3. Example
-4. Key Points
+RULES:
+- Do NOT repeat the context
+- Do NOT include HTML tags like <div>
+- Do NOT copy raw notes
+- Answer ONLY in clean structured format
+- If information is missing, say "Not found in document"
 
-Context:
+FORMAT YOUR ANSWER STRICTLY AS:
+
+Definition:
+Explanation:
+Example:
+Key Points:
+
+-------------------------
+CONTEXT:
 {context}
+-------------------------
 
-Question:
+QUESTION:
 {query}
 
-Answer:
+FINAL ANSWER:
 """
-
-    # generate response (FIXED INDENTATION)
+       # generate response (FIXED INDENTATION)
     result = llm.invoke(prompt)
 
     # safe return handling
@@ -66,3 +76,4 @@ Answer:
         return result.content
 
     return result
+result = result.replace("<div>", "").replace("</div>", "")
