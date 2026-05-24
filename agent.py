@@ -1,77 +1,124 @@
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
-from langchain_community.llms import HuggingFacePipeline
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSeq2SeqLM,
+    pipeline
+)
+
+from langchain_community.llms import (
+    HuggingFacePipeline
+)
 
 
-# -------------------------
-# LLM SETUP (CLOUD SAFE FIX)
-# -------------------------
+# -----------------------------------
+# LOAD LLM
+# -----------------------------------
 def get_llm():
+
     model_name = "google/flan-t5-base"
 
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name
+    )
 
+    model = AutoModelForSeq2SeqLM.from_pretrained(
+        model_name
+    )
+
+    # IMPORTANT FIX
     pipe = pipeline(
-        "text-generation",
+        "text2text-generation",
         model=model,
         tokenizer=tokenizer,
-        max_new_tokens=256,
+        max_new_tokens=200,
         do_sample=False
     )
 
-    return HuggingFacePipeline(pipeline=pipe)
+    return HuggingFacePipeline(
+        pipeline=pipe
+    )
 
 
 llm = get_llm()
 
 
-# -------------------------
-# MAIN FUNCTION
-# -------------------------
+# -----------------------------------
+# GENERATE ANSWER
+# -----------------------------------
 def generate_answer(query, vectorstore):
 
-    # retrieve similar docs
-    docs = vectorstore.similarity_search(query, k=8)
+    try:
 
-    if not docs:
-        return "No relevant information found in the document."
+        # Retrieve relevant chunks
+        docs = vectorstore.similarity_search(
+            query,
+            k=5
+        )
 
-    # build context
-    context = "\n\n".join([doc.page_content for doc in docs])
+        if not docs:
+            return (
+                "No relevant information "
+                "found in document."
+            )
 
-    prompt = f"""
-You are an expert computer science academic assistant.
+        # Build context
+        context = "\n\n".join(
+            [
+                doc.page_content
+                for doc in docs
+            ]
+        )
 
-Use ONLY the context below to answer the question.
+        # Cleaner prompt
+        prompt = f"""
+You are an expert academic assistant.
 
-RULES:
-- Do NOT repeat the context
-- Do NOT include HTML tags like <div>
-- Do NOT copy raw notes
-- Answer ONLY in clean structured format
-- If information is missing, say "Not found in document"
+Answer ONLY using the provided context.
 
-FORMAT YOUR ANSWER STRICTLY AS:
+Instructions:
+- Give a clean and short answer.
+- Do NOT include:
+  Question:
+  Final Answer:
+- Do NOT output HTML tags.
+- Do NOT copy raw extracted notes.
+- If information is unavailable, say:
+"Not found in document."
 
-Definition:
-Explanation:
-Example:
-Key Points:
-
--------------------------
-CONTEXT:
+Context:
 {context}
--------------------------
 
-QUESTION:
+User Question:
 {query}
 
-FINAL ANSWER:
+Answer:
 """
-       # generate response (FIXED INDENTATION)
-    result = llm.invoke(prompt)
-    # safe return handling
-    if hasattr(result, "content"):
-        return result.content
 
-    return result
+        # Generate response
+        result = llm.invoke(prompt)
+
+        result = str(result)
+
+        # Clean weird outputs
+        result = (
+            result.replace("<div>", "")
+            .replace("</div>", "")
+            .replace("Question:", "")
+            .replace("Final Answer:", "")
+            .replace("<br>", "")
+            .strip()
+        )
+
+        # Fallback
+        if len(result) < 5:
+            return (
+                "Could not generate "
+                "a proper answer."
+            )
+
+        return result
+
+    except Exception as e:
+        return (
+            f"Error generating answer: "
+            f"{str(e)}"
+        )
