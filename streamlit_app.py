@@ -116,11 +116,9 @@ section[data-testid="stSidebar"] * {
     background: white;
     color: #111827;
     padding: 18px;
-    border-radius: 16px;
-    margin-bottom: 20px;
-    border: 1px solid #e5e7eb;
-    width: fit-content;
-    max-width: 80%;
+    font-size: 16px;
+    line-height: 1.7;
+    font-weight: 400;
 }
 
 /* Horizontal Line */
