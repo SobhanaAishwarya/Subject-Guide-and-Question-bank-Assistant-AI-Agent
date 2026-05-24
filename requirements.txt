@@ -1,12 +1,13 @@
 streamlit
 PyMuPDF
 python-docx
-langchain-ollama
 sentence-transformers
 huggingface-hub
 numpy
 pandas
 scikit-learn
+langchain
 langchain-community
+langchain-text-splitters
 transformers
 torch
