@@ -1,5 +1,5 @@
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import Chroma
 
 
 def create_vector_store(chunks):
@@ -8,6 +8,9 @@ def create_vector_store(chunks):
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    vectorstore = FAISS.from_texts(chunks, embeddings)
+    vectorstore = Chroma.from_texts(
+        chunks,
+        embedding=embeddings
+    )
 
     return vectorstore
