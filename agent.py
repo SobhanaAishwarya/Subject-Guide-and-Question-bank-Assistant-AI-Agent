@@ -87,7 +87,7 @@ Context:
 User Question:
 {query}
 
-Answer:
+
 """
 
         result = llm.invoke(prompt)
