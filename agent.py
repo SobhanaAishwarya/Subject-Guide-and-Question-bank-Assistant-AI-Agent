@@ -24,9 +24,9 @@ def get_llm():
         model_name
     )
 
-    # IMPORTANT FIX
+    # STREAMLIT CLOUD FIX
     pipe = pipeline(
-        "text2text-generation",
+        "text-generation",
         model=model,
         tokenizer=tokenizer,
         max_new_tokens=200,
@@ -48,7 +48,6 @@ def generate_answer(query, vectorstore):
 
     try:
 
-        # Retrieve relevant chunks
         docs = vectorstore.similarity_search(
             query,
             k=5
@@ -60,7 +59,6 @@ def generate_answer(query, vectorstore):
                 "found in document."
             )
 
-        # Build context
         context = "\n\n".join(
             [
                 doc.page_content
@@ -68,20 +66,19 @@ def generate_answer(query, vectorstore):
             ]
         )
 
-        # Cleaner prompt
         prompt = f"""
 You are an expert academic assistant.
 
 Answer ONLY using the provided context.
 
 Instructions:
-- Give a clean and short answer.
+- Give a clean answer.
 - Do NOT include:
   Question:
   Final Answer:
 - Do NOT output HTML tags.
-- Do NOT copy raw extracted notes.
-- If information is unavailable, say:
+- Do NOT repeat raw extracted text.
+- If answer is unavailable, say:
 "Not found in document."
 
 Context:
@@ -93,12 +90,11 @@ User Question:
 Answer:
 """
 
-        # Generate response
         result = llm.invoke(prompt)
 
         result = str(result)
 
-        # Clean weird outputs
+        # clean weird output
         result = (
             result.replace("<div>", "")
             .replace("</div>", "")
@@ -108,7 +104,7 @@ Answer:
             .strip()
         )
 
-        # Fallback
+        # fallback
         if len(result) < 5:
             return (
                 "Could not generate "
