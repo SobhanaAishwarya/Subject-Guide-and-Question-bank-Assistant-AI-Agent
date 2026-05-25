@@ -24,9 +24,9 @@ def get_llm():
         model_name
     )
 
-    # STREAMLIT CLOUD FIX
+    # Better pipeline for FLAN-T5
     pipe = pipeline(
-        "text-generation",
+        "text2text-generation",
         model=model,
         tokenizer=tokenizer,
         max_new_tokens=200,
@@ -48,6 +48,7 @@ def generate_answer(query, vectorstore):
 
     try:
 
+        # Retrieve relevant chunks
         docs = vectorstore.similarity_search(
             query,
             k=5
@@ -59,6 +60,7 @@ def generate_answer(query, vectorstore):
                 "found in document."
             )
 
+        # Combine retrieved chunks
         context = "\n\n".join(
             [
                 doc.page_content
@@ -66,28 +68,39 @@ def generate_answer(query, vectorstore):
             ]
         )
 
+        # Better prompt
         prompt = f"""
+Answer the question using the context below.
+Give only a clean answer.
 
 Context:
 {context}
 
+Question:
+{query}
 """
 
+        # Generate response
         result = llm.invoke(prompt)
 
-        result = str(result)
+        result = str(result).strip()
 
-        # clean weird output
-        result = (
-            result.replace("<div>", "")
-            .replace("</div>", "")
-            .replace("Question:", "")
-            .replace("Final Answer:", "")
-            .replace("<br>", "")
-            .strip()
-        )
+        # Clean unwanted output
+        unwanted = [
+            "<div>",
+            "</div>",
+            "<br>",
+            "Question:",
+            "Answer:",
+            "Final Answer:"
+        ]
 
-        # fallback
+        for word in unwanted:
+            result = result.replace(word, "")
+
+        result = result.strip()
+
+        # Fallback response
         if len(result) < 5:
             return (
                 "Could not generate "
