@@ -27,9 +27,7 @@ def get_llm():
     pipe = pipeline(
         "text2text-generation",
         model=model,
-        tokenizer=tokenizer,
-        max_new_tokens=256,
-        do_sample=False
+        tokenizer=tokenizer
     )
 
     return HuggingFacePipeline(
