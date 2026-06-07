@@ -1,8 +1,14 @@
 streamlit
 PyMuPDF
 python-docx
+sentence-transformers
+numpy
+pandas
+scikit-learn
 langchain
 langchain-community
 langchain-text-splitters
-chromadb
-google-generativeai
+transformers
+torch
+accelerate
+sentencepiece

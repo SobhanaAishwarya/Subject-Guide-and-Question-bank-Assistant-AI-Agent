@@ -1,17 +1,43 @@
-import streamlit as st
-import google.generativeai as genai
-
-# -----------------------------------
-# CONFIGURE GEMINI
-# -----------------------------------
-
-genai.configure(
-    api_key=st.secrets["GEMINI_API_KEY"]
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSeq2SeqLM,
+    pipeline
 )
 
-model = genai.GenerativeModel(
-    "gemini-2.0-flash"
+from langchain_community.llms import (
+    HuggingFacePipeline
 )
+
+# -----------------------------------
+# LOAD LLM
+# -----------------------------------
+
+def get_llm():
+
+    model_name = "google/flan-t5-base"
+
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name
+    )
+
+    model = AutoModelForSeq2SeqLM.from_pretrained(
+        model_name
+    )
+
+    pipe = pipeline(
+        task="text2text-generation",
+        model=model,
+        tokenizer=tokenizer,
+        max_new_tokens=256,
+        do_sample=False
+    )
+
+    return HuggingFacePipeline(
+        pipeline=pipe
+    )
+
+# Load model once
+llm = get_llm()
 
 # -----------------------------------
 # GENERATE ANSWER
@@ -53,11 +79,38 @@ Question:
 Answer clearly and professionally.
 """
 
-        response = model.generate_content(
-            prompt
-        )
+        result = llm.invoke(prompt)
 
-        return response.text
+        result = str(result).strip()
+
+        unwanted = [
+            "<div>",
+            "</div>",
+            "<br>",
+            "Question:",
+            "Answer:",
+            "Final Answer:"
+        ]
+
+        for word in unwanted:
+            result = result.replace(
+                word,
+                ""
+            )
+
+        result = result.strip()
+
+        if len(result) < 5:
+            return (
+                "Could not generate "
+                "a proper answer."
+            )
+
+        return result
 
     except Exception as e:
-        return f"Error: {str(e)}"
+
+        return (
+            f"Error generating answer: "
+            f"{str(e)}"
+        )
