@@ -1,4 +1,4 @@
-```python
+
 # -----------------------------------
 # HELPER FUNCTIONS
 # -----------------------------------
@@ -230,4 +230,3 @@ def generate_answer(
             f"Error generating answer: "
             f"{str(e)}"
         )
-
