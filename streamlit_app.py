@@ -283,7 +283,7 @@ if uploaded_file:
         st.session_state.chat_history.append(("user", query))
 
         with st.spinner("Generating response..."):
-            answer = generate_answer(query, vectorstore)
+            answer = generate_answer(query, vectorstore,mode)
 
         st.session_state.chat_history.append(("bot", answer))
         st.info(f"Agent Mode Active: {mode}")

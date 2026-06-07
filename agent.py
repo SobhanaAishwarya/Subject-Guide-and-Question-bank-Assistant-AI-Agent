@@ -1,49 +1,130 @@
-from transformers import (
-    AutoTokenizer,
-    AutoModelForSeq2SeqLM,
-    pipeline
-)
-
-from langchain_community.llms import (
-    HuggingFacePipeline
-)
-
 # -----------------------------------
-# LOAD LLM
+# PROMPTS FOR DIFFERENT AGENTS
 # -----------------------------------
 
-def get_llm():
+def get_prompt(mode, context, query):
 
-    model_name = "google/flan-t5-base"
+    if mode == "Ask Questions":
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_name
-    )
+        return context[:1500]
 
-    model = AutoModelForSeq2SeqLM.from_pretrained(
-        model_name
-    )
+    elif mode == "Generate Quiz":
 
-    pipe = pipeline(
-        task="text2text-generation",
-        model=model,
-        tokenizer=tokenizer,
-        max_new_tokens=256,
-        do_sample=False
-    )
+        topics = context.split("\n")
 
-    return HuggingFacePipeline(
-        pipeline=pipe
-    )
+        quiz = "QUIZ QUESTIONS\n\n"
 
-# Load model once
-llm = None
+        for i, topic in enumerate(topics[:10], start=1):
+
+            if topic.strip():
+
+                quiz += f"""
+Q{i}. {topic.strip()}?
+
+A) Option A
+B) Option B
+C) Option C
+D) Option D
+
+Answer: A
+
+"""
+
+        return quiz
+
+    elif mode == "Generate Viva Questions":
+
+        topics = context.split("\n")
+
+        viva = "VIVA QUESTIONS\n\n"
+
+        count = 1
+
+        for topic in topics:
+
+            if topic.strip():
+
+                viva += f"""
+Q{count}. Explain {topic.strip()}.
+
+Answer:
+{topic.strip()}
+
+"""
+
+                count += 1
+
+            if count > 10:
+                break
+
+        return viva
+
+    elif mode == "Important Topics":
+
+        topics = []
+
+        for line in context.split("\n"):
+
+            line = line.strip()
+
+            if len(line) > 5:
+
+                topics.append(line)
+
+        result = "IMPORTANT TOPICS\n\n"
+
+        for i, topic in enumerate(topics[:10], start=1):
+
+            result += f"{i}. {topic}\n"
+
+        return result
+
+    elif mode == "Generate Notes":
+
+        return f"""
+STUDY NOTES
+
+{context[:2000]}
+"""
+
+    elif mode == "Study Planner":
+
+        return f"""
+7 DAY STUDY PLAN
+
+Day 1:
+Read first section
+
+Day 2:
+Revise and practice
+
+Day 3:
+Study intermediate concepts
+
+Day 4:
+Important topics revision
+
+Day 5:
+Solve questions
+
+Day 6:
+Mock viva preparation
+
+Day 7:
+Final revision
+
+Topics Covered:
+{context[:1000]}
+"""
+
+    return context[:1500]
+
 
 # -----------------------------------
 # GENERATE ANSWER
 # -----------------------------------
 
-def generate_answer(query, vectorstore):
+def generate_answer(query, vectorstore, mode):
 
     try:
 
@@ -53,6 +134,7 @@ def generate_answer(query, vectorstore):
         )
 
         if not docs:
+
             return (
                 "No relevant information found "
                 "in the uploaded document."
@@ -65,21 +147,11 @@ def generate_answer(query, vectorstore):
             ]
         )
 
-        prompt = f"""
-You are an Academic AI Assistant.
-
-Use only the provided context.
-
-Context:
-{context}
-
-Question:
-{query}
-
-Answer clearly and professionally.
-"""
-
-        result = context[:1500]
+        result = get_prompt(
+            mode,
+            context,
+            query
+        )
 
         result = str(result).strip()
 
@@ -93,6 +165,7 @@ Answer clearly and professionally.
         ]
 
         for word in unwanted:
+
             result = result.replace(
                 word,
                 ""
@@ -101,6 +174,7 @@ Answer clearly and professionally.
         result = result.strip()
 
         if len(result) < 5:
+
             return (
                 "Could not generate "
                 "a proper answer."
