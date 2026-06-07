@@ -142,21 +142,29 @@ header {
 # SIDEBAR
 # -----------------------------------
 with st.sidebar:
-
-    st.markdown("## AI Academic Assistant")
-
-    st.markdown("---")
-
     st.markdown("""
-    ### Features
+### Features
 
-    - PDF/DOCX Question Answering
-    - Semantic Search
-    - AI Generated Responses
-    - RAG Architecture
-    - Academic Assistance
-    - Question Bank Support
-    """)
+- PDF/DOCX Question Answering
+- Quiz Generator
+- Viva Preparation
+- Notes Generator
+- Study Planner
+- Important Topics Finder
+""")
+    mode = st.selectbox(
+        "Choose Assistant Mode",
+        ["Ask Questions",
+        "Generate Quiz",
+        "Generate Viva Questions",
+        "Important Topics",
+        "Generate Notes",
+        "Study Planner"
+]
+    )
+    st.session_state.mode=mode
+
+    st.success(f"Current Mode: {mode}")
 
     st.markdown("---")
 
@@ -180,6 +188,8 @@ AI-powered academic assistant using semantic search and Retrieval-Augmented Gene
 # -----------------------------------
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+if "mode" not in st.session_state:
+    st.session_state.mode="Ask Questions"
 
 # -----------------------------------
 # FILE UPLOADER
@@ -260,9 +270,9 @@ if uploaded_file:
     default_question = st.session_state.get("quick_question", "")
 
     query = st.text_input(
-        "Ask your question",
+        f"{mode}",
         value=default_question,
-        placeholder="Example: Explain normalization in DBMS"
+        placeholder=f"Enter request for {mode}"
     )
 
     # -----------------------------------
@@ -276,6 +286,7 @@ if uploaded_file:
             answer = generate_answer(query, vectorstore)
 
         st.session_state.chat_history.append(("bot", answer))
+        st.info(f"Agent Mode Active: {mode}")
 
     # -----------------------------------
     # CHAT SECTION
