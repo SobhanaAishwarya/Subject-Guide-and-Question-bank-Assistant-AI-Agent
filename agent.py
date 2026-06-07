@@ -1,25 +1,75 @@
+```python
 # -----------------------------------
-# PROMPTS FOR DIFFERENT AGENTS
+# HELPER FUNCTIONS
+# -----------------------------------
+
+def get_relevant_lines(context, query):
+
+    query_words = query.lower().split()
+
+    scored_lines = []
+
+    for line in context.split("\n"):
+
+        line = line.strip()
+
+        if not line:
+            continue
+
+        score = 0
+
+        for word in query_words:
+
+            if word in line.lower():
+                score += 1
+
+        scored_lines.append((score, line))
+
+    scored_lines.sort(reverse=True)
+
+    top_lines = [
+        line
+        for score, line in scored_lines[:10]
+        if score > 0
+    ]
+
+    if not top_lines:
+        top_lines = context.split("\n")[:10]
+
+    return top_lines
+
+
+# -----------------------------------
+# AGENT LOGIC
 # -----------------------------------
 
 def get_prompt(mode, context, query):
 
+    relevant_lines = get_relevant_lines(
+        context,
+        query
+    )
+
     if mode == "Ask Questions":
 
-        return context[:1500]
+        return (
+            "ANSWER\n\n" +
+            "\n".join(relevant_lines[:8])
+        )
 
     elif mode == "Generate Quiz":
 
-        topics = context.split("\n")
+        result = "QUIZ QUESTIONS\n\n"
 
-        quiz = "QUIZ QUESTIONS\n\n"
+        for i, line in enumerate(
+            relevant_lines[:10],
+            start=1
+        ):
 
-        for i, topic in enumerate(topics[:10], start=1):
+            result += f"""
+Q{i}. What is related to:
 
-            if topic.strip():
-
-                quiz += f"""
-Q{i}. {topic.strip()}?
+{line}
 
 A) Option A
 B) Option B
@@ -30,101 +80,104 @@ Answer: A
 
 """
 
-        return quiz
+        return result
 
     elif mode == "Generate Viva Questions":
 
-        topics = context.split("\n")
+        result = "VIVA QUESTIONS\n\n"
 
-        viva = "VIVA QUESTIONS\n\n"
+        for i, line in enumerate(
+            relevant_lines[:10],
+            start=1
+        ):
+
+            result += f"""
+Q{i}. Explain:
+
+{line}
+
+Answer:
+{line}
+
+"""
+
+        return result
+
+    elif mode == "Important Topics":
+
+        result = "IMPORTANT TOPICS\n\n"
+
+        seen = set()
 
         count = 1
 
-        for topic in topics:
+        for line in relevant_lines:
 
-            if topic.strip():
+            if line not in seen:
 
-                viva += f"""
-Q{count}. Explain {topic.strip()}.
+                result += (
+                    f"{count}. {line}\n\n"
+                )
 
-Answer:
-{topic.strip()}
-
-"""
+                seen.add(line)
 
                 count += 1
 
             if count > 10:
                 break
 
-        return viva
-
-    elif mode == "Important Topics":
-
-        topics = []
-
-        for line in context.split("\n"):
-
-            line = line.strip()
-
-            if len(line) > 5:
-
-                topics.append(line)
-
-        result = "IMPORTANT TOPICS\n\n"
-
-        for i, topic in enumerate(topics[:10], start=1):
-
-            result += f"{i}. {topic}\n"
-
         return result
 
     elif mode == "Generate Notes":
 
-        return f"""
-STUDY NOTES
+        result = "STUDY NOTES\n\n"
 
-{context[:2000]}
-"""
+        for line in relevant_lines[:10]:
+
+            result += (
+                f"• {line}\n"
+            )
+
+        return result
 
     elif mode == "Study Planner":
 
-        return f"""
-7 DAY STUDY PLAN
+        result = "7 DAY STUDY PLAN\n\n"
 
-Day 1:
-Read first section
+        topics = relevant_lines[:7]
 
-Day 2:
-Revise and practice
+        for i, topic in enumerate(
+            topics,
+            start=1
+        ):
 
-Day 3:
-Study intermediate concepts
+            result += f"""
+Day {i}
 
-Day 4:
-Important topics revision
+Topic:
+{topic}
 
-Day 5:
-Solve questions
+Task:
+Study and revise
 
-Day 6:
-Mock viva preparation
-
-Day 7:
-Final revision
-
-Topics Covered:
-{context[:1000]}
 """
 
-    return context[:1500]
+        return result
+
+    return "\n".join(
+        relevant_lines[:10]
+    )
 
 
 # -----------------------------------
 # GENERATE ANSWER
 # -----------------------------------
 
-def generate_answer(query, vectorstore, mode):
+def generate_answer(
+    query,
+    vectorstore,
+    mode
+):
 
     try:
 
@@ -153,8 +206,6 @@ def generate_answer(query, vectorstore, mode):
             query
         )
 
-        result = str(result).strip()
-
         unwanted = [
             "<div>",
             "</div>",
@@ -171,16 +222,7 @@ def generate_answer(query, vectorstore, mode):
                 ""
             )
 
-        result = result.strip()
-
-        if len(result) < 5:
-
-            return (
-                "Could not generate "
-                "a proper answer."
-            )
-
-        return result
+        return result.strip()
 
     except Exception as e:
 
@@ -188,3 +230,4 @@ def generate_answer(query, vectorstore, mode):
             f"Error generating answer: "
             f"{str(e)}"
         )
+
