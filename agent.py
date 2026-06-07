@@ -37,7 +37,7 @@ def get_llm():
     )
 
 # Load model once
-llm = get_llm()
+llm = None
 
 # -----------------------------------
 # GENERATE ANSWER
@@ -79,7 +79,7 @@ Question:
 Answer clearly and professionally.
 """
 
-        result = llm.invoke(prompt)
+        result = context[:1500]
 
         result = str(result).strip()
 
