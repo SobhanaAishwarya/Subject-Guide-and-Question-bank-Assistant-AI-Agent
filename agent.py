@@ -1,34 +1,14 @@
-from transformers import (
-    AutoTokenizer,
-    AutoModelForSeq2SeqLM,
-    pipeline
-)
-
-from langchain_community.llms import (
-    HuggingFacePipeline
-)
-
+from transformers import pipeline
+from langchain_community.llms import HuggingFacePipeline
 
 # -----------------------------------
 # LOAD LLM
 # -----------------------------------
 def get_llm():
 
-    model_name = "google/flan-t5-base"
-
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_name
-    )
-
-    model = AutoModelForSeq2SeqLM.from_pretrained(
-        model_name
-    )
-
-    # Better pipeline for FLAN-T5
     pipe = pipeline(
-        "text2text-generation",
-        model=model,
-        tokenizer=tokenizer,
+        task="text2text-generation",
+        model="google/flan-t5-base",
         max_new_tokens=200,
         do_sample=False
     )
@@ -68,16 +48,19 @@ def generate_answer(query, vectorstore):
             ]
         )
 
-        # Better prompt
+        # Prompt
         prompt = f"""
 Answer the question using the context below.
-Give only a clean answer.
+If the answer is not present in the context, say:
+"I could not find the answer in the uploaded document."
 
 Context:
 {context}
 
 Question:
 {query}
+
+Answer:
 """
 
         # Generate response
@@ -100,7 +83,6 @@ Question:
 
         result = result.strip()
 
-        # Fallback response
         if len(result) < 5:
             return (
                 "Could not generate "

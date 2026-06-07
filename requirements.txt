@@ -9,5 +9,6 @@ scikit-learn
 langchain
 langchain-community
 langchain-text-splitters
-transformers
-torch
+transformers==4.41.2
+torch==2.3.1
+accelerate==0.31.0
