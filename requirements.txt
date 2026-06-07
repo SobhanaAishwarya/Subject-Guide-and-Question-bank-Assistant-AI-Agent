@@ -1,19 +1,21 @@
-streamlit==1.58.0
+streamlit
+
 PyMuPDF
 python-docx
 
-sentence-transformers==2.7.0
-transformers==4.41.2
+sentence-transformers
+transformers
 
-torch==2.2.2
-
-accelerate==0.30.1
+torch
+accelerate
 sentencepiece
 
-numpy==1.26.4
-pandas==2.2.2
-scikit-learn==1.5.1
+numpy
+pandas
+scikit-learn
 
 langchain
 langchain-community
 langchain-text-splitters
+
+chromadb
