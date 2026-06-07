@@ -25,7 +25,7 @@ def get_llm():
     )
 
     pipe = pipeline(
-        task="text2text-generation",
+        "text2text-generation",
         model=model,
         tokenizer=tokenizer,
         max_new_tokens=256,
