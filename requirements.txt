@@ -2,10 +2,11 @@ streamlit
 PyMuPDF
 python-docx
 
-transformers
+transformers==4.41.2
 torch
 
 langchain
 langchain-community
 langchain-text-splitters
-
+sentencepiece
+accelerate

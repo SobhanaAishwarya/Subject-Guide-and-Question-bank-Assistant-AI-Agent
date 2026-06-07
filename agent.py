@@ -1,172 +1,152 @@
 
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSeq2SeqLM,
+    pipeline
+)
+
 # -----------------------------------
-# HELPER FUNCTIONS
+# LOAD MODEL
 # -----------------------------------
 
-def get_relevant_lines(context, query):
+def get_llm():
 
-    query_words = query.lower().split()
+    model_name = "google/flan-t5-small"
 
-    scored_lines = []
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name
+    )
 
-    for line in context.split("\n"):
+    model = AutoModelForSeq2SeqLM.from_pretrained(
+        model_name
+    )
 
-        line = line.strip()
+    pipe = pipeline(
+        task="text2text-generation",
+        model=model,
+        tokenizer=tokenizer,
+        max_new_tokens=256,
+        do_sample=False
+    )
 
-        if not line:
-            continue
+    return pipe
 
-        score = 0
 
-        for word in query_words:
-
-            if word in line.lower():
-                score += 1
-
-        scored_lines.append((score, line))
-
-    scored_lines.sort(reverse=True)
-
-    top_lines = [
-        line
-        for score, line in scored_lines[:10]
-        if score > 0
-    ]
-
-    if not top_lines:
-        top_lines = context.split("\n")[:10]
-
-    return top_lines
+# Load model once
+llm = get_llm()
 
 
 # -----------------------------------
-# AGENT LOGIC
+# PROMPTS
 # -----------------------------------
 
 def get_prompt(mode, context, query):
 
-    relevant_lines = get_relevant_lines(
-        context,
-        query
-    )
-
     if mode == "Ask Questions":
 
-        return (
-            "ANSWER\n\n" +
-            "\n".join(relevant_lines[:8])
-        )
+        return f"""
+You are an Academic AI Assistant.
+
+Answer the question using ONLY the context below.
+
+Context:
+{context}
+
+Question:
+{query}
+
+Provide:
+- Definition
+- Explanation
+- Example (if applicable)
+- Key Points
+"""
 
     elif mode == "Generate Quiz":
 
-        result = "QUIZ QUESTIONS\n\n"
+        return f"""
+Generate 10 multiple-choice questions from the context.
 
-        for i, line in enumerate(
-            relevant_lines[:10],
-            start=1
-        ):
+Context:
+{context}
 
-            result += f"""
-Q{i}. What is related to:
-
-{line}
-
-A) Option A
-B) Option B
-C) Option C
-D) Option D
-
-Answer: A
-
+For each question provide:
+- Question
+- Option A
+- Option B
+- Option C
+- Option D
+- Correct Answer
 """
-
-        return result
 
     elif mode == "Generate Viva Questions":
 
-        result = "VIVA QUESTIONS\n\n"
+        return f"""
+Generate 10 important viva questions with answers.
 
-        for i, line in enumerate(
-            relevant_lines[:10],
-            start=1
-        ):
+Context:
+{context}
 
-            result += f"""
-Q{i}. Explain:
+Format:
 
-{line}
-
+Q1:
 Answer:
-{line}
 
+Q2:
+Answer:
 """
-
-        return result
 
     elif mode == "Important Topics":
 
-        result = "IMPORTANT TOPICS\n\n"
+        return f"""
+Extract the top 10 most important topics.
 
-        seen = set()
+Context:
+{context}
 
-        count = 1
-
-        for line in relevant_lines:
-
-            if line not in seen:
-
-                result += (
-                    f"{count}. {line}\n\n"
-                )
-
-                seen.add(line)
-
-                count += 1
-
-            if count > 10:
-                break
-
-        return result
+For each topic provide:
+- Topic Name
+- Why it is important
+"""
 
     elif mode == "Generate Notes":
 
-        result = "STUDY NOTES\n\n"
+        return f"""
+Create concise study notes.
 
-        for line in relevant_lines[:10]:
+Context:
+{context}
 
-            result += (
-                f"• {line}\n"
-            )
+Format:
 
-        return result
+Topic:
+Explanation:
+Key Points:
+"""
 
     elif mode == "Study Planner":
 
-        result = "7 DAY STUDY PLAN\n\n"
+        return f"""
+Create a 7-day study plan from the document.
 
-        topics = relevant_lines[:7]
+Context:
+{context}
 
-        for i, topic in enumerate(
-            topics,
-            start=1
-        ):
-
-            result += f"""
-Day {i}
-
-Topic:
-{topic}
-
-Task:
-Study and revise
-
+For each day provide:
+- Topics
+- Hours Required
+- Revision Tasks
 """
 
-        return result
+    return f"""
+Answer the following question.
 
-    return "\n".join(
-        relevant_lines[:10]
-    )
+Context:
+{context}
+
+Question:
+{query}
+"""
 
 
 # -----------------------------------
@@ -200,11 +180,19 @@ def generate_answer(
             ]
         )
 
-        result = get_prompt(
+        prompt = get_prompt(
             mode,
             context,
             query
         )
+
+        response = llm(
+            prompt
+        )
+
+        result = response[0][
+            "generated_text"
+        ]
 
         unwanted = [
             "<div>",
@@ -222,7 +210,16 @@ def generate_answer(
                 ""
             )
 
-        return result.strip()
+        result = result.strip()
+
+        if len(result) < 5:
+
+            return (
+                "Could not generate "
+                "a proper answer."
+            )
+
+        return result
 
     except Exception as e:
 
