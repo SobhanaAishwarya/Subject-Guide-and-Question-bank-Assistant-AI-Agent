@@ -1,34 +1,26 @@
-from transformers import pipeline
-from langchain_community.llms import HuggingFacePipeline
+import streamlit as st
+import google.generativeai as genai
 
 # -----------------------------------
-# LOAD LLM
+# CONFIGURE GEMINI
 # -----------------------------------
-def get_llm():
 
-    pipe = pipeline(
-        task="text2text-generation",
-        model="google/flan-t5-base",
-        max_new_tokens=200,
-        do_sample=False
-    )
+genai.configure(
+    api_key=st.secrets["GEMINI_API_KEY"]
+)
 
-    return HuggingFacePipeline(
-        pipeline=pipe
-    )
-
-
-llm = get_llm()
-
+model = genai.GenerativeModel(
+    "gemini-1.5-flash"
+)
 
 # -----------------------------------
 # GENERATE ANSWER
 # -----------------------------------
+
 def generate_answer(query, vectorstore):
 
     try:
 
-        # Retrieve relevant chunks
         docs = vectorstore.similarity_search(
             query,
             k=5
@@ -36,11 +28,10 @@ def generate_answer(query, vectorstore):
 
         if not docs:
             return (
-                "No relevant information "
-                "found in document."
+                "No relevant information found "
+                "in the uploaded document."
             )
 
-        # Combine retrieved chunks
         context = "\n\n".join(
             [
                 doc.page_content
@@ -48,11 +39,10 @@ def generate_answer(query, vectorstore):
             ]
         )
 
-        # Prompt
         prompt = f"""
-Answer the question using the context below.
-If the answer is not present in the context, say:
-"I could not find the answer in the uploaded document."
+You are an Academic AI Assistant.
+
+Use only the provided context.
 
 Context:
 {context}
@@ -60,39 +50,14 @@ Context:
 Question:
 {query}
 
-Answer:
+Answer clearly and professionally.
 """
 
-        # Generate response
-        result = llm.invoke(prompt)
+        response = model.generate_content(
+            prompt
+        )
 
-        result = str(result).strip()
-
-        # Clean unwanted output
-        unwanted = [
-            "<div>",
-            "</div>",
-            "<br>",
-            "Question:",
-            "Answer:",
-            "Final Answer:"
-        ]
-
-        for word in unwanted:
-            result = result.replace(word, "")
-
-        result = result.strip()
-
-        if len(result) < 5:
-            return (
-                "Could not generate "
-                "a proper answer."
-            )
-
-        return result
+        return response.text
 
     except Exception as e:
-        return (
-            f"Error generating answer: "
-            f"{str(e)}"
-        )
+        return f"Error: {str(e)}"
