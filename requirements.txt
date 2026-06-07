@@ -1,21 +1,12 @@
 streamlit
-
 PyMuPDF
 python-docx
 
-sentence-transformers==2.7.0
-transformers==4.41.2
-torch==2.2.2
-accelerate==0.30.1
-sentencepiece
+transformers
+torch
 
-numpy==1.26.4
-pandas==2.2.2
-scikit-learn==1.5.1
+langchain
+langchain-community
+langchain-text-splitters
 
-langchain==0.2.16
-langchain-community==0.2.16
-langchain-text-splitters==0.2.2
-
-huggingface-hub
 chromadb
