@@ -1,6 +1,26 @@
-*.zip
+# Environment variables
+.env
+
+# Python
 __pycache__/
-.venv/
-*.zip
-__pycache__/
-.venv/
+*.pyc
+
+# Streamlit
+.streamlit/
+
+# Vector Database
+vectorstore/
+
+# Uploaded Files
+uploads/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Virtual Environment
+venv/
+env/
