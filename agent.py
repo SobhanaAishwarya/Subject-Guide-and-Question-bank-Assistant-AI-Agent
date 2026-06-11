@@ -1,53 +1,52 @@
-
 from transformers import (
-    AutoTokenizer,
-    AutoModelForSeq2SeqLM,
-    pipeline
+AutoTokenizer,
+AutoModelForSeq2SeqLM,
+pipeline
 )
 
 # -----------------------------------
+
 # LOAD MODEL
+
 # -----------------------------------
 
 def get_llm():
+model_name = "google/flan-t5-small"
 
-    model_name = "google/flan-t5-small"
+tokenizer = AutoTokenizer.from_pretrained(
+    model_name
+)
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_name
-    )
+model = AutoModelForSeq2SeqLM.from_pretrained(
+    model_name
+)
 
-    model = AutoModelForSeq2SeqLM.from_pretrained(
-        model_name
-    )
+pipe = pipeline(
+    "text2text-generation",
+    model=model,
+    tokenizer=tokenizer,
+    max_new_tokens=512,
+    do_sample=False
+)
 
-    pipe = pipeline(
-        task="text2text-generation",
-        model=model,
-        tokenizer=tokenizer,
-        max_new_tokens=256,
-        do_sample=False
-    )
+return pipe
 
-    return pipe
-
-
-# Load model once
 llm = get_llm()
 
-
 # -----------------------------------
+
 # PROMPTS
+
 # -----------------------------------
 
 def get_prompt(mode, context, query):
+context = context[:2500]
 
-    if mode == "Ask Questions":
+if mode == "Ask Questions":
 
-        return f"""
-You are an Academic AI Assistant.
+    return f"""
 
-Answer the question using ONLY the context below.
+Answer the question based ONLY on the context.
 
 Context:
 {context}
@@ -56,33 +55,44 @@ Question:
 {query}
 
 Provide:
-- Definition
-- Explanation
-- Example (if applicable)
-- Key Points
+Definition:
+Explanation:
+Example:
+Key Points:
 """
 
-    elif mode == "Generate Quiz":
 
-        return f"""
-Generate 10 multiple-choice questions from the context.
+elif mode == "Generate Quiz":
+
+    return f"""
+
+
+Create 10 multiple choice questions from the context.
 
 Context:
 {context}
 
-For each question provide:
-- Question
-- Option A
-- Option B
-- Option C
-- Option D
-- Correct Answer
+Format:
+
+Q1.
+A)
+B)
+C)
+D)
+
+Correct Answer:
+
+Q2.
+...
 """
 
-    elif mode == "Generate Viva Questions":
 
-        return f"""
-Generate 10 important viva questions with answers.
+elif mode == "Generate Viva Questions":
+
+    return f"""
+
+
+Generate 10 viva interview questions and answers.
 
 Context:
 {context}
@@ -96,23 +106,31 @@ Q2:
 Answer:
 """
 
-    elif mode == "Important Topics":
 
-        return f"""
-Extract the top 10 most important topics.
+elif mode == "Important Topics":
+
+    return f"""
+
+
+Read the context carefully.
+
+Extract the TOP 10 MOST IMPORTANT TOPICS.
+
+For each topic provide:
+
+Topic:
+Importance:
 
 Context:
 {context}
-
-For each topic provide:
-- Topic Name
-- Why it is important
 """
 
-    elif mode == "Generate Notes":
 
-        return f"""
-Create concise study notes.
+elif mode == "Generate Notes":
+
+    return f"""
+
+Create student-friendly study notes.
 
 Context:
 {context}
@@ -124,22 +142,28 @@ Explanation:
 Key Points:
 """
 
-    elif mode == "Study Planner":
 
-        return f"""
-Create a 7-day study plan from the document.
+elif mode == "Study Planner":
+
+    return f"""
+
+Create a 7-day study plan.
 
 Context:
 {context}
 
 For each day provide:
-- Topics
-- Hours Required
-- Revision Tasks
+
+Day:
+Topics:
+Tasks:
+Revision:
 """
 
-    return f"""
-Answer the following question.
+return f"""
+```
+
+Answer the question.
 
 Context:
 {context}
@@ -148,82 +172,69 @@ Question:
 {query}
 """
 
-
 # -----------------------------------
+
 # GENERATE ANSWER
+
 # -----------------------------------
 
 def generate_answer(
-    query,
-    vectorstore,
-    mode
+query,
+vectorstore,
+mode
 ):
+try:
 
-    try:
+    docs = vectorstore.similarity_search(
+        query,
+        k=5
+    )
 
-        docs = vectorstore.similarity_search(
-            query,
-            k=5
-        )
-
-        if not docs:
-
-            return (
-                "No relevant information found "
-                "in the uploaded document."
-            )
-
-        context = "\n\n".join(
-            [
-                doc.page_content
-                for doc in docs
-            ]
-        )
-
-        prompt = get_prompt(
-            mode,
-            context,
-            query
-        )
-
-        response = llm(
-            prompt
-        )
-
-        result = response[0][
-            "generated_text"
-        ]
-
-        unwanted = [
-            "<div>",
-            "</div>",
-            "<br>",
-            "Question:",
-            "Answer:",
-            "Final Answer:"
-        ]
-
-        for word in unwanted:
-
-            result = result.replace(
-                word,
-                ""
-            )
-
-        result = result.strip()
-
-        if len(result) < 5:
-
-            return (
-                "Could not generate "
-                "a proper answer."
-            )
-
-        return result
-
-    except Exception as e:
+    if not docs:
 
         return (
-            f"Error generating answer: "
-            f"{str(e)}"
+            "No relevant information found in the uploaded document."
         )
+
+    context = "\n\n".join(
+        [
+            doc.page_content
+            for doc in docs
+        ]
+    )
+
+    prompt = get_prompt(
+        mode,
+        context,
+        query
+    )
+
+    response = llm(prompt)
+
+    result = response[0]["generated_text"]
+
+    result = result.replace(
+        "Answer:",
+        ""
+    )
+
+    result = result.replace(
+        "Final Answer:",
+        ""
+    )
+
+    result = result.strip()
+
+    if len(result) < 10:
+
+        return (
+            "The model could not generate a meaningful response."
+        )
+
+    return result
+
+except Exception as e:
+
+    return (
+        f"Error generating answer: {str(e)}"
+    )
