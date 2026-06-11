@@ -3,3 +3,6 @@ headless = true
 
 [global]
 mainModule = "app.py"
+
+[server]
+fileWatcherType = "none"
