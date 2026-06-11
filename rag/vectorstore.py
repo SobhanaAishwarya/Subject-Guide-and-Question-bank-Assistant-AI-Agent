@@ -59,11 +59,7 @@ def save_vectorstore(
 ):
     os.makedirs(
         VECTORSTORE_DIR,
-        exist_ok=True
-    )
-    path = os.path.join(
-        VECTORSTORE_DIR,
-        exist_ok=True
+        exist_ok = True
     )
     path=os.path.join(
         VECTORSTORE_DIR,

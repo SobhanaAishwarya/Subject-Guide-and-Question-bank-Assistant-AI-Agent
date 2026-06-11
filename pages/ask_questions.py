@@ -1,4 +1,7 @@
 import streamlit as st
+import os
+
+from config.settings import VECTORSTORE_DIR
 
 from rag.vectorstore import (
     load_vectorstore
@@ -15,17 +18,29 @@ from agents.qa_agent import (
 
 def show_qa_page():
 
-    st.title(
-        "🤖 Ask Questions"
+    st.title("🤖 Ask Questions")
+
+    # DEBUG INFO
+    kb_path = os.path.join(
+        VECTORSTORE_DIR,
+        "knowledge_base"
+    )
+
+    st.write(
+        "Vectorstore Path:",
+        kb_path
+    )
+
+    st.write(
+        "Knowledge Base Exists:",
+        os.path.exists(kb_path)
     )
 
     question = st.text_input(
         "Enter your question"
     )
 
-    if st.button(
-        "Ask"
-    ):
+    if st.button("Ask"):
 
         try:
 
@@ -43,8 +58,8 @@ def show_qa_page():
 
             st.markdown(answer)
 
-        except Exception:
+        except Exception as e:
 
             st.error(
-                "Upload documents first."
+                f"Error: {str(e)}"
             )
