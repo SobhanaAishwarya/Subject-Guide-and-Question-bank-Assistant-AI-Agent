@@ -1,51 +1,49 @@
 from transformers import (
-AutoTokenizer,
-AutoModelForSeq2SeqLM,
-pipeline
+    AutoTokenizer,
+    AutoModelForSeq2SeqLM,
+    pipeline
 )
 
 # -----------------------------------
-
 # LOAD MODEL
-
 # -----------------------------------
 
 def get_llm():
-model_name = "google/flan-t5-small"
 
-tokenizer = AutoTokenizer.from_pretrained(
-    model_name
-)
+    model_name = "google/flan-t5-small"
 
-model = AutoModelForSeq2SeqLM.from_pretrained(
-    model_name
-)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name
+    )
 
-pipe = pipeline(
-    "text2text-generation",
-    model=model,
-    tokenizer=tokenizer,
-    max_new_tokens=512,
-    do_sample=False
-)
+    model = AutoModelForSeq2SeqLM.from_pretrained(
+        model_name
+    )
 
-return pipe
+    pipe = pipeline(
+        "text2text-generation",
+        model=model,
+        tokenizer=tokenizer,
+        max_new_tokens=512,
+        do_sample=False
+    )
+
+    return pipe
+
 
 llm = get_llm()
 
 # -----------------------------------
-
 # PROMPTS
-
 # -----------------------------------
 
 def get_prompt(mode, context, query):
-context = context[:2500]
 
-if mode == "Ask Questions":
+    context = context[:2500]
 
-    return f"""
+    if mode == "Ask Questions":
 
+        return f"""
 Answer the question based ONLY on the context.
 
 Context:
@@ -55,18 +53,16 @@ Question:
 {query}
 
 Provide:
+
 Definition:
 Explanation:
 Example:
 Key Points:
 """
 
+    elif mode == "Generate Quiz":
 
-elif mode == "Generate Quiz":
-
-    return f"""
-
-
+        return f"""
 Create 10 multiple choice questions from the context.
 
 Context:
@@ -86,12 +82,9 @@ Q2.
 ...
 """
 
+    elif mode == "Generate Viva Questions":
 
-elif mode == "Generate Viva Questions":
-
-    return f"""
-
-
+        return f"""
 Generate 10 viva interview questions and answers.
 
 Context:
@@ -106,12 +99,9 @@ Q2:
 Answer:
 """
 
+    elif mode == "Important Topics":
 
-elif mode == "Important Topics":
-
-    return f"""
-
-
+        return f"""
 Read the context carefully.
 
 Extract the TOP 10 MOST IMPORTANT TOPICS.
@@ -125,11 +115,9 @@ Context:
 {context}
 """
 
+    elif mode == "Generate Notes":
 
-elif mode == "Generate Notes":
-
-    return f"""
-
+        return f"""
 Create student-friendly study notes.
 
 Context:
@@ -142,11 +130,9 @@ Explanation:
 Key Points:
 """
 
+    elif mode == "Study Planner":
 
-elif mode == "Study Planner":
-
-    return f"""
-
+        return f"""
 Create a 7-day study plan.
 
 Context:
@@ -160,9 +146,7 @@ Tasks:
 Revision:
 """
 
-return f"""
-```
-
+    return f"""
 Answer the question.
 
 Context:
@@ -172,69 +156,67 @@ Question:
 {query}
 """
 
+
 # -----------------------------------
-
 # GENERATE ANSWER
-
 # -----------------------------------
 
 def generate_answer(
-query,
-vectorstore,
-mode
+    query,
+    vectorstore,
+    mode
 ):
-try:
 
-    docs = vectorstore.similarity_search(
-        query,
-        k=5
-    )
+    try:
 
-    if not docs:
-
-        return (
-            "No relevant information found in the uploaded document."
+        docs = vectorstore.similarity_search(
+            query,
+            k=5
         )
 
-    context = "\n\n".join(
-        [
-            doc.page_content
-            for doc in docs
-        ]
-    )
+        if not docs:
+            return (
+                "No relevant information found in the uploaded document."
+            )
 
-    prompt = get_prompt(
-        mode,
-        context,
-        query
-    )
-
-    response = llm(prompt)
-
-    result = response[0]["generated_text"]
-
-    result = result.replace(
-        "Answer:",
-        ""
-    )
-
-    result = result.replace(
-        "Final Answer:",
-        ""
-    )
-
-    result = result.strip()
-
-    if len(result) < 10:
-
-        return (
-            "The model could not generate a meaningful response."
+        context = "\n\n".join(
+            [
+                doc.page_content
+                for doc in docs
+            ]
         )
 
-    return result
+        prompt = get_prompt(
+            mode,
+            context,
+            query
+        )
 
-except Exception as e:
+        response = llm(prompt)
 
-    return (
-        f"Error generating answer: {str(e)}"
-    )
+        result = response[0]["generated_text"]
+
+        result = result.replace(
+            "Answer:",
+            ""
+        )
+
+        result = result.replace(
+            "Final Answer:",
+            ""
+        )
+
+        result = result.strip()
+
+        if len(result) < 10:
+            return (
+                "The model could not generate a meaningful response."
+            )
+
+        return result
+
+    except Exception as e:
+
+        return (
+            f"Error generating answer: {str(e)}"
+        )
