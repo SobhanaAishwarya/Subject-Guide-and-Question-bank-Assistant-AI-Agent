@@ -1,4 +1,5 @@
 import bcrypt
+import sqlite3
 
 from database.db import get_connection
 
@@ -14,6 +15,7 @@ def hash_password(password):
 def create_user(name, email, password):
 
     conn = get_connection()
+
     cursor = conn.cursor()
 
     try:
@@ -39,6 +41,10 @@ def create_user(name, email, password):
         conn.commit()
 
         return True, "Account created successfully"
+
+    except sqlite3.IntegrityError:
+
+        return False, "Email already registered"
 
     except Exception as e:
 
