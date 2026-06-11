@@ -57,7 +57,10 @@ def save_vectorstore(
         vectorstore,
         filename="knowledge_base"
 ):
-
+    os.makedirs(
+        VECTORSTORE_DIR,
+        exist_ok=True
+    )
     path = os.path.join(
         VECTORSTORE_DIR,
         filename
