@@ -63,9 +63,12 @@ def save_vectorstore(
     )
     path = os.path.join(
         VECTORSTORE_DIR,
+        exist_ok=True
+    )
+    path=os.path.join(
+        VECTORSTORE_DIR,
         filename
     )
-
     vectorstore.save_local(path)
 
 
@@ -79,7 +82,6 @@ def load_vectorstore(
         VECTORSTORE_DIR,
         filename
     )
-
     return FAISS.load_local(
         path,
         embeddings,
