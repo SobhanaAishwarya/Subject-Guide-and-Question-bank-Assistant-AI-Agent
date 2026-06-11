@@ -1,0 +1,22 @@
+.main {
+    background-color: #0f172a;
+}
+
+.stApp {
+    background-color: #0f172a;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    color: white;
+}
+
+section[data-testid="stSidebar"] {
+    background-color: #111827;
+}
+
+div[data-testid="metric-container"] {
+    background-color: #1e293b;
+    padding: 15px;
+    border-radius: 15px;
+    border: 1px solid #334155;
+}
