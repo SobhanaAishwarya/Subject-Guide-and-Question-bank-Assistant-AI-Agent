@@ -20,98 +20,76 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Premium Modern SaaS Dark Theme CSS (Refined Deep Slate & Vivid Sky Blue Accents)
+# Premium Modern SaaS Dark Theme CSS (Refined Slate & Vibrant Accents)
 st.markdown("""
     <style>
-    /* Main Layout Base */
+    /* Main Background & Text */
     .stApp {
         background-color: #0B0F19;
         color: #F1F5F9;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* Clean Cards & Structural Dynamic Containers */
+    /* Clean Cards & Containers */
     div[data-testid="stVerticalBlock"] > div {
         background-color: #111827;
         border-radius: 12px;
         padding: 24px;
         margin-bottom: 16px;
         border: 1px solid #1F2937;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
     
-    /* Left Navigation Sidebar Override */
+    /* Sidebar Styling */
     section[data-testid="stSidebar"] {
         background-color: #0F172A !important;
         border-right: 1px solid #1E293B;
     }
     
-    /* Constrain and Center the Authentication Screen Block Layout */
+    /* Center and constrain the login block width */
     .auth-container {
-        max-width: 460px;
+        max-width: 480px;
         margin: 60px auto;
-        padding: 36px;
+        padding: 32px;
         background-color: #111827;
         border-radius: 16px;
         border: 1px solid #1F2937;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
     }
     
-    /* Buttons Custom Action Styling */
+    /* Buttons Custom Styling */
     .stButton>button {
-        background-color: #0EA5E9 !important; /* Premium Sky Blue */
-        color: #FFFFFF !important;
+        background-color: #6366F1 !important;
+        color: white !important;
         border-radius: 8px !important;
         border: none !important;
         font-weight: 600 !important;
-        padding: 10px 24px !important;
-        transition: all 0.2s ease-in-out;
+        padding: 10px 20px !important;
+        transition: all 0.2s ease;
     }
     .stButton>button:hover {
-        background-color: #0284C7 !important; /* Deeper Ocean Blue */
-        box-shadow: 0 0 16px rgba(14, 165, 233, 0.4);
+        background-color: #4F46E5 !important;
+        box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
         transform: translateY(-1px);
     }
     
-    /* Input Fields Accent Refinements */
-    input, textarea, select {
+    /* Input Fields Accent Refinement */
+    input, textarea {
         background-color: #1F2937 !important;
         color: #F8FAFC !important;
         border: 1px solid #374151 !important;
         border-radius: 8px !important;
-        padding: 10px !important;
     }
     input:focus, textarea:focus {
-        border-color: #0EA5E9 !important;
-        box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2) !important;
+        border-color: #6366F1 !important;
     }
     
-    /* Balanced Metrics Design Matrix */
+    /* Balanced Metrics Design */
     div[data-testid="stMetricValue"] {
-        color: #38BDF8 !important; /* Cyber Sky Accent */
+        color: #38BDF8 !important;
         font-weight: 700;
-        font-size: 2.4rem !important;
-        letter-spacing: -0.025em;
+        font-size: 2.25rem !important;
     }
     div[data-testid="stMetricLabel"] {
         color: #94A3B8 !important;
-        font-size: 0.95rem !important;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-    
-    /* Custom Decorative Clean Badge Lines */
-    .hero-title {
-        font-size: 2.25rem;
-        font-weight: 800;
-        color: #F8FAFC;
-        letter-spacing: -0.025em;
-        margin-bottom: 4px;
-    }
-    .hero-subtitle {
-        color: #94A3B8;
-        font-size: 1.05rem;
-        margin-bottom: 24px;
     }
     
     hr {
@@ -132,13 +110,19 @@ if "initialized" not in st.session_state:
     logger.info("Application infrastructure states fully hydrated.")
 
 def render_login_signup():
-    # Use asymmetric structural column spacing to center layout cleanly
-    _, center_col, _ = st.columns([1, 1.25, 1])
+    # Use standard HTML blocks within a single clean column layout turn to bypass nested border generation
+    _, center_col, _ = st.columns([1, 1.3, 1])
     
     with center_col:
-        st.markdown('<div class="auth-container">', unsafe_allow_html=True)
-        st.markdown('<div class="hero-title">✈️ StudyPilot AI</div>', unsafe_allow_html=True)
-        st.markdown('<div class="hero-subtitle">Intelligent Agentic Study Workspace</div>', unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="auth-card">
+                <div style="font-size: 2rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.025em; margin-bottom: 4px;">✈️ StudyPilot AI</div>
+                <div style="color: #94A3B8; font-size: 0.95rem; margin-bottom: 24px;">Intelligent Agentic Academic Workspace</div>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
         
         tab1, tab2 = st.tabs(["🔒 Secure Login", "📝 Create Account"])
         
@@ -165,15 +149,14 @@ def render_login_signup():
             st.write(" ")
             if st.button("Register & Initialize Profile", use_container_width=True):
                 if not reg_name or not reg_email or not reg_password:
-                    st.warning("All tracking data fields are strictly required.")
+                    st.warning("All verification tracking data fields are strictly required.")
                 else:
                     with get_db_session() as session:
                         new_user = AuthManager.register_user(session, reg_name, reg_email, reg_password)
                         if new_user:
                             st.success("Account initialized successfully! Please sign in.")
                         else:
-                            st.error("Registration rejected: Target email already registered.")
-        st.markdown('</div>', unsafe_allow_html=True)
+                            st.error("Registration rejected: Email already registered.")
 
 def render_dashboard():
     user = st.session_state.user
