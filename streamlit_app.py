@@ -20,80 +20,92 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Premium Modern SaaS Dark Theme CSS (Refined Slate & Vibrant Accents)
+# Clean & Professional Butter Yellow + Light SaaS Theme
 st.markdown("""
     <style>
-    /* Main Background & Text */
+    /* Main Background & Base Text */
     .stApp {
-        background-color: #0B0F19;
-        color: #F1F5F9;
+        background-color: #FFFFFF;
+        color: #1E293B;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     
-    /* Clean Cards & Containers */
+    /* Content Containers & Cards - Soft Butter Yellow / Cream Tint */
     div[data-testid="stVerticalBlock"] > div {
-        background-color: #111827;
+        background-color: #FFFDF0;
         border-radius: 12px;
         padding: 24px;
         margin-bottom: 16px;
-        border: 1px solid #1F2937;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid #FEF08A;
+        box-shadow: 0 4px 6px -1px rgba(254, 240, 138, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }
     
-    /* Sidebar Styling */
+    /* Navigation Sidebar Style - Crisp Light Grey / Warm Tint */
     section[data-testid="stSidebar"] {
-        background-color: #0F172A !important;
-        border-right: 1px solid #1E293B;
+        background-color: #F8FAFC !important;
+        border-right: 1px solid #E2E8F0;
     }
     
-    /* Center and constrain the login block width */
-    .auth-container {
-        max-width: 480px;
-        margin: 60px auto;
-        padding: 32px;
-        background-color: #111827;
+    /* Login Form Card Alignment Wrapper */
+    .auth-card {
+        background-color: #FFFDF0;
+        border: 1px solid #FEF08A;
         border-radius: 16px;
-        border: 1px solid #1F2937;
+        padding: 32px;
+        box-shadow: 0 10px 15px -3px rgba(254, 240, 138, 0.3);
+        margin-bottom: 20px;
     }
     
-    /* Buttons Custom Styling */
+    /* Action Buttons - Warm Gold / Amber Accent */
     .stButton>button {
-        background-color: #6366F1 !important;
-        color: white !important;
+        background-color: #EAB308 !important; /* Butter Yellow Accent Gold */
+        color: #FFFFFF !important;
         border-radius: 8px !important;
         border: none !important;
         font-weight: 600 !important;
-        padding: 10px 20px !important;
+        padding: 10px 24px !important;
         transition: all 0.2s ease;
     }
     .stButton>button:hover {
-        background-color: #4F46E5 !important;
-        box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+        background-color: #CA8A04 !important; /* Darker Amber */
+        box-shadow: 0 0 12px rgba(234, 179, 8, 0.4);
         transform: translateY(-1px);
     }
     
-    /* Input Fields Accent Refinement */
-    input, textarea {
-        background-color: #1F2937 !important;
-        color: #F8FAFC !important;
-        border: 1px solid #374151 !important;
+    /* Input Form Elements styling */
+    input, textarea, select {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        border: 1px solid #E2E8F0 !important;
         border-radius: 8px !important;
+        padding: 10px !important;
     }
     input:focus, textarea:focus {
-        border-color: #6366F1 !important;
+        border-color: #EAB308 !important;
+        box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.2) !important;
     }
     
-    /* Balanced Metrics Design */
+    /* Metrics Layout Settings */
     div[data-testid="stMetricValue"] {
-        color: #38BDF8 !important;
+        color: #CA8A04 !important;
         font-weight: 700;
-        font-size: 2.25rem !important;
+        font-size: 2.3rem !important;
     }
     div[data-testid="stMetricLabel"] {
-        color: #94A3B8 !important;
+        color: #64748B !important;
+        font-size: 0.9rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    /* Chat bubbles text color alignment override */
+    div[data-testid="stChatMessage"] {
+        background-color: #F8FAFC !important;
+        border: 1px solid #E2E8F0 !important;
     }
     
     hr {
-        border-top: 1px solid #1F2937 !important;
+        border-top: 1px solid #FEF08A !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -110,15 +122,15 @@ if "initialized" not in st.session_state:
     logger.info("Application infrastructure states fully hydrated.")
 
 def render_login_signup():
-    # Use standard HTML blocks within a single clean column layout turn to bypass nested border generation
-    _, center_col, _ = st.columns([1, 1.3, 1])
+    # Asymmetric column strategy to cleanly center the form without nested box issues
+    _, center_col, _ = st.columns([1, 1.2, 1])
     
     with center_col:
         st.markdown(
             """
             <div class="auth-card">
-                <div style="font-size: 2rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.025em; margin-bottom: 4px;">✈️ StudyPilot AI</div>
-                <div style="color: #94A3B8; font-size: 0.95rem; margin-bottom: 24px;">Intelligent Agentic Academic Workspace</div>
+                <div style="font-size: 2.25rem; font-weight: 800; color: #1E293B; letter-spacing: -0.025em; margin-bottom: 4px;">✈️ StudyPilot AI</div>
+                <div style="color: #64748B; font-size: 0.95rem;">Intelligent Agentic Academic Workspace</div>
             </div>
             """, 
             unsafe_allow_html=True
@@ -149,7 +161,7 @@ def render_login_signup():
             st.write(" ")
             if st.button("Register & Initialize Profile", use_container_width=True):
                 if not reg_name or not reg_email or not reg_password:
-                    st.warning("All verification tracking data fields are strictly required.")
+                    st.warning("All tracking data fields are strictly required.")
                 else:
                     with get_db_session() as session:
                         new_user = AuthManager.register_user(session, reg_name, reg_email, reg_password)
@@ -425,7 +437,7 @@ def render_settings():
     st.markdown("---")
     st.caption("StudyPilot AI Engine running on LangGraph Orchestration Topology Layers.")
 
-# Core Sidebar Context Router Terminal Setup
+# Core Sidebar Context Router Setup
 if st.session_state.user is None:
     render_login_signup()
 else:
@@ -441,7 +453,7 @@ else:
             st.session_state.user = None
             st.rerun()
 
-    # Route selected layout controller bounds viewport screens cleanly
+    # Viewport Routing
     if choice == "Dashboard":
         render_dashboard()
     elif choice == "Chat Workspace":

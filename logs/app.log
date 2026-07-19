@@ -61,3 +61,23 @@
 [2026-07-19 19:24:05.633] [INFO] [agentic_ai_clean] [progress_tracker.py:22]: Initializing ProgressTrackerAgent LLM with model=openai/gpt-4o
 [2026-07-19 19:24:05.639] [INFO] [agentic_ai_clean] [graph_orchestrator.py:94]: LangGraph workflow state structure successfully wired and compiled.
 [2026-07-19 19:24:05.705] [INFO] [agentic_ai_clean] [streamlit_app.py:132]: Application infrastructure states fully hydrated.
+[2026-07-19 19:26:42.676] [INFO] [agentic_ai_clean] [connection.py:14]: Initializing database engine with target URL: sqlite:///agentic_study_assistant.db
+[2026-07-19 19:26:42.820] [INFO] [agentic_ai_clean] [connection.py:32]: SQLAlchemy database engine and SessionLocal factory initialized successfully.
+[2026-07-19 19:27:20.672] [INFO] [agentic_ai_clean] [connection.py:43]: Executing database table initialization...
+[2026-07-19 19:27:20.682] [INFO] [agentic_ai_clean] [connection.py:45]: All database tables synced and created successfully.
+[2026-07-19 19:27:20.683] [INFO] [agentic_ai_clean] [text_processor.py:25]: TextProcessor initialized with chunk_size=1000, chunk_overlap=200
+[2026-07-19 19:27:20.684] [INFO] [agentic_ai_clean] [vector_store.py:26]: Initializing OpenAIEmbeddings with model=text-embedding-3-small
+[2026-07-19 19:27:23.655] [INFO] [agentic_ai_clean] [pdf_service.py:73]: Scanning built-in library directories targets for core assets updates: knowledge_base
+[2026-07-19 19:27:23.657] [INFO] [agentic_ai_clean] [pdf_service.py:80]: No base systemic textbooks detected inside the global knowledge folder layout path.
+[2026-07-19 19:27:23.657] [INFO] [agentic_ai_clean] [graph_orchestrator.py:25]: Initializing multi-agent structural graph component objects...
+[2026-07-19 19:27:23.659] [INFO] [agentic_ai_clean] [supervisor.py:24]: Initializing SupervisorAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:27:25.620] [INFO] [agentic_ai_clean] [teacher.py:23]: Initializing TeacherAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:27:27.608] [INFO] [agentic_ai_clean] [vector_store.py:26]: Initializing OpenAIEmbeddings with model=text-embedding-3-small
+[2026-07-19 19:27:29.647] [INFO] [agentic_ai_clean] [pdf_worker.py:25]: Initializing PDFWorkerAgent with model=openai/gpt-4o
+[2026-07-19 19:27:29.649] [INFO] [agentic_ai_clean] [quiz_master.py:24]: Initializing QuizMasterAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:27:29.650] [INFO] [agentic_ai_clean] [notes_generator.py:22]: Initializing NotesGeneratorAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:27:29.652] [INFO] [agentic_ai_clean] [flashcard_worker.py:24]: Initializing FlashcardWorkerAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:27:29.653] [INFO] [agentic_ai_clean] [planner.py:22]: Initializing StudyPlannerAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:27:29.654] [INFO] [agentic_ai_clean] [progress_tracker.py:22]: Initializing ProgressTrackerAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:27:29.664] [INFO] [agentic_ai_clean] [graph_orchestrator.py:94]: LangGraph workflow state structure successfully wired and compiled.
+[2026-07-19 19:27:29.741] [INFO] [agentic_ai_clean] [streamlit_app.py:110]: Application infrastructure states fully hydrated.
