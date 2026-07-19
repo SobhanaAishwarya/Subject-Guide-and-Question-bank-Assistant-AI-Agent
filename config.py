@@ -3,6 +3,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# 1. Define these as global constants at the file level
+UPLOAD_DIR = "uploads"
+VECTOR_DIR = "vectorstore"
+DATABASE_DIR = "database"
+DB_PATH = os.path.join(DATABASE_DIR, "edumind.db")
+
 class Config:
     PROJECT_NAME = "EduMind AI"
     OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
@@ -18,11 +24,11 @@ class Config:
     COLOR_BORDER = "#EFE5BE"
     COLOR_HOVER = "#FFF6CC"
     
-    # Storage Directives
-    UPLOAD_DIR = "uploads"
-    VECTOR_DIR = "vectorstore"
-    DB_PATH = "database/edumind.db"
+    # 2. Attach them to the class namespace so the rest of your files don't break
+    UPLOAD_DIR = UPLOAD_DIR
+    VECTOR_DIR = VECTOR_DIR
+    DB_PATH = DB_PATH
 
-# Ensure runtime initialization directories exist
-for folder in [UPLOAD_DIR, VECTOR_DIR, "database"]:
+# 3. Now the initialization loop can safely execute without scoping errors
+for folder in [UPLOAD_DIR, VECTOR_DIR, DATABASE_DIR]:
     os.makedirs(folder, exist_ok=True)
