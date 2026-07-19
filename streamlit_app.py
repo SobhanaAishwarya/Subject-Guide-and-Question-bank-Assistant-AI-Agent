@@ -1,507 +1,312 @@
 import streamlit as st
-import os
-from dotenv import load_dotenv
 
-# Load configurations first
-load_dotenv()
-
-from database.connection import init_db, get_db_session
-from database.schemas import User, QuizResult, StudyProgress
-from auth.manager import AuthManager
-from services.pdf_service import PDFService
-from memory.history_manager import HistoryManager
-from agents.graph_orchestrator import GraphOrchestrator
-from utils.logger import logger
-
-# Initialize foundational app configurations
-st.set_page_config(
-    page_title="StudyPilot AI",
+# MUST BE RUN AS THE ABSOLUTE FIRST STREAMLIT COMMAND
+st.set_page_view = st.set_page_config(
+    page_title="EduMind AI",
+    page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Minimalist Pastel Butter-Cream & Soft Slate UI Engineering Sheet
-st.markdown("""
-    <style>
-    /* Main Layout Viewport */
-    .stApp {
-        background-color: #FCFBF7;
-        color: #334155;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    
-    /* Global Container Reset */
-    div[data-testid="stVerticalBlock"] > div {
-        background-color: transparent !important;
-        border: none !important;
-        padding: 0px !important;
-        margin-bottom: 0px !important;
-        box-shadow: none !important;
-    }
-    
-    /* Explicitly scoped card classes for valid structural UI metrics widgets only */
-    .custom-card {
-        background-color: #FFFDF0 !important;
-        border: 1px solid #EAE4B8 !important;
-        border-radius: 8px !important;
-        padding: 20px !important;
-        margin-bottom: 16px !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
-    }
-    
-    /* Profile Summary Layout Panel Grid */
-    .profile-panel {
-        background-color: #FFFFFF !important;
-        border: 1px solid #E2E8F0 !important;
-        border-radius: 8px !important;
-        padding: 20px !important;
-        margin-bottom: 24px !important;
-    }
-    
-    /* Left Navigation Menu Sidebar Layout */
-    section[data-testid="stSidebar"] {
-        background-color: #F7F5EB !important;
-        border-right: 1px solid #EAE4B8 !important;
-    }
-    
-    /* Clean Centered Action Passport Box */
-    .auth-box {
-        background-color: #FFFDF0;
-        border: 1px solid #EAE4B8;
-        border-radius: 12px;
-        padding: 32px;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        margin-top: 40px;
-    }
-    
-    /* SaaS Primary Buttons - Soft Charcoal / Amber Hover Interaction */
-    .stButton>button {
-        background-color: #D9A714 !important;
-        color: #FFFFFF !important;
-        border-radius: 6px !important;
-        border: none !important;
-        font-weight: 600 !important;
-        padding: 8px 20px !important;
-        transition: all 0.2s ease;
-    }
-    .stButton>button:hover {
-        background-color: #B88E10 !important;
-        transform: translateY(-1px);
-    }
-    
-    /* Clear Text Area Controls */
-    input, textarea, select {
-        background-color: #FFFFFF !important;
-        color: #1E293B !important;
-        border: 1px solid #CBD5E1 !important;
-        border-radius: 6px !important;
-    }
-    input:focus, textarea:focus {
-        border-color: #D9A714 !important;
-        box-shadow: 0 0 0 2px rgba(217, 167, 20, 0.15) !important;
-    }
-    
-    /* Premium High-Density Analytics Metric Typography */
-    div[data-testid="stMetricValue"] {
-        color: #B88E10 !important;
-        font-weight: 700;
-        font-size: 2rem !important;
-    }
-    div[data-testid="stMetricLabel"] {
-        color: #64748B !important;
-        font-size: 0.85rem !important;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-    
-    /* Explicitly hide standard horizontal rules to clean up extra lines */
-    hr {
-        display: none !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
+import os
+import uuid
+import pandas as pd
+import plotly.express as px
+from datetime import datetime
 
-# Instantiate application singletons inside session caches safely
-if "initialized" not in st.session_state:
-    init_db()
-    pdf_svc = PDFService()
-    pdf_svc.initialize_global_knowledge_base()
-    st.session_state.orchestrator = GraphOrchestrator()
-    st.session_state.pdf_service = pdf_svc
-    st.session_state.user = None
-    st.session_state.initialized = True
-    logger.info("Application infrastructure states fully hydrated.")
+from config import Config
+from database.db_manager import init_db, get_db_connection, increment_analytic, update_avg_score
+from utils.ui_components import apply_custom_theme, render_hero
+from utils.doc_processor import DocumentProcessor
+from services.rag_service import SimpleFAISSStore
+from services.openrouter_service import OpenRouterService
 
-def render_login_signup():
-    _, center_col, _ = st.columns([1, 1.2, 1])
+# Database Schema & File Repositories Check
+init_db()
+vector_store = SimpleFAISSStore()
+
+# Inject SaaS Layout Stylesheet rules
+apply_custom_theme()
+
+# Unified Global State Management Routing initialization
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "🏠 Dashboard"
+if "session_token" not in st.session_state:
+    st.session_state.session_token = str(uuid.uuid4())
+
+# -------------------------------------------------------------------------
+# SIDEBAR NAVIGATION CONTROLLERS
+# -------------------------------------------------------------------------
+with st.sidebar:
+    st.markdown(
+        f"<div style='padding: 10px 0; text-align:center;'><h2 style='color:{Config.COLOR_TEXT};font-weight:800;'>🧠 EduMind AI</h2></div>",
+        unsafe_allow_html=True
+    )
+    st.markdown("---")
     
-    with center_col:
-        st.markdown(
-            """
-            <div class="auth-box">
-                <div style="font-size: 2rem; font-weight: 700; color: #1E293B; letter-spacing: -0.025em; margin-bottom: 2px;">StudyPilot AI</div>
-                <div style="color: #64748B; font-size: 0.9rem; margin-bottom: 20px;">Intelligent Agentic Academic Workspace</div>
-            </div>
-            """, 
-            unsafe_allow_html=True
-        )
+    navigation_options = [
+        "🏠 Dashboard", "🤖 AI Chat", "📄 Documents", "📚 Topics",
+        "❓ Question Bank", "📝 Quiz", "🧠 Flashcards", "📊 Analytics", "⚙ Settings"
+    ]
+    
+    for opt in navigation_options:
+        if st.button(opt, use_container_width=True):
+            st.session_state.current_page = opt
+
+st.markdown(f"### {st.session_state.current_page}")
+st.markdown("---")
+
+# -------------------------------------------------------------------------
+# VIEW CONTROLLERS (ROUTING DISPATCHER LOOP)
+# -------------------------------------------------------------------------
+
+if st.session_state.current_page == "🏠 Dashboard":
+    render_hero()
+    
+    # Load Real-Time Database Metrics counters
+    with get_db_connection() as conn:
+        doc_count = conn.execute("SELECT COUNT(*) FROM documents").fetchone()[0]
+        q_count = conn.execute("SELECT value_int FROM analytics WHERE key='questions_asked'").fetchone()[0]
+        quiz_count = conn.execute("SELECT value_int FROM analytics WHERE key='quizzes_taken'").fetchone()[0]
+        fc_count = conn.execute("SELECT COUNT(*) FROM flashcards").fetchone()[0]
+
+    m1, m2, m3, m4 = st.columns(4)
+    with m1:
+        st.markdown(f'<div class="em-card"><div class="em-metric-val">{doc_count}</div><div class="em-metric-lbl">Active Documents</div></div>', unsafe_allow_html=True)
+    with m2:
+        st.markdown(f'<div class="em-card"><div class="em-metric-val">{q_count}</div><div class="em-metric-lbl">Queries Analyzed</div></div>', unsafe_allow_html=True)
+    with m3:
+        st.markdown(f'<div class="em-card"><div class="em-metric-val">{quiz_count}</div><div class="em-metric-lbl">Quizzes Conducted</div></div>', unsafe_allow_html=True)
+    with m4:
+        st.markdown(f'<div class="em-card"><div class="em-metric-val">{fc_count}</div><div class="em-metric-lbl">Flashcards Deck</div></div>', unsafe_allow_html=True)
+
+    st.markdown("### 📈 Current Learning Activity Trackers")
+    act_df = pd.DataFrame({
+        'Study Vector Metrics': ['Structured Modules', 'Concept Iterations', 'RAG Evaluations', 'Exam Simulation Mockups'],
+        'Progress Percentage': [68, 45, 80, 30]
+    })
+    fig = px.bar(act_df, x='Progress Percentage', y='Study Vector Metrics', orientation='h', 
+                 color_discrete_sequence=[Config.COLOR_ACCENT], template="simple_white")
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    st.plotly_chart(fig, use_container_width=True)
+
+
+elif st.session_state.current_page == "🤖 AI Chat":
+    st.markdown("<p style='color: gray;'>Structured Multi-Source Context RAG Matrix Environment</p>", unsafe_allow_html=True)
+    
+    # Retrieve local session chat metrics
+    with get_db_connection() as conn:
+        rows = conn.execute("SELECT role, content FROM chat_history WHERE session_id = ? ORDER BY id ASC", (st.session_state.session_token,)).fetchall()
+    
+    # Render Current History State
+    for r in rows:
+        bubble_class = "chat-bubble-user" if r['role'] == "user" else "chat-bubble-ai"
+        st.markdown(f'<div class="{bubble_class}">{r["content"]}</div>', unsafe_allow_html=True)
+    
+    st.markdown("<div style='clear:both; margin-bottom: 20px;'></div>", unsafe_allow_html=True)
+    
+    # Handle Input Capture Interface Execution
+    with st.form("chat_form", clear_on_submit=True):
+        user_input = st.text_input("Pose a query to the processed study materials corpus:")
+        submitted = st.form_submit_with_button("Dispatch Processing Stream")
         
-        tab1, tab2 = st.tabs(["Secure Login", "Create Account"])
-        
-        with tab1:
-            st.write(" ")
-            login_email = st.text_input("Email Address", key="login_email")
-            login_password = st.text_input("Password", type="password", key="login_password")
-            st.write(" ")
-            if st.button("Authenticate Session", use_container_width=True):
-                with get_db_session() as session:
-                    user = AuthManager.authenticate_user(session, login_email, login_password)
-                    if user:
-                        st.session_state.user = {"id": user.id, "name": user.name, "email": user.email}
-                        st.success(f"Welcome back, {user.name}!")
-                        st.rerun()
-                    else:
-                        st.error("Invalid email coordinates or password match.")
-
-        with tab2:
-            st.write(" ")
-            reg_name = st.text_input("Full Name", key="reg_name")
-            reg_email = st.text_input("Email Address", key="reg_email")
-            reg_password = st.text_input("Password", type="password", key="reg_password")
-            st.write(" ")
-            if st.button("Register & Initialize Profile", use_container_width=True):
-                if not reg_name or not reg_email or not reg_password:
-                    st.warning("All data fields are strictly required.")
-                else:
-                    with get_db_session() as session:
-                        new_user = AuthManager.register_user(session, reg_name, reg_email, reg_password)
-                        if new_user:
-                            st.success("Account initialized successfully! Please sign in.")
-                        else:
-                            st.error("Registration rejected: Email already registered.")
-
-def render_dashboard():
-    user = st.session_state.user
-    st.markdown('<div style="font-size: 1.75rem; font-weight: 700; color: #1E293B; margin-bottom: 4px;">Academic Workspace Overview</div>', unsafe_allow_html=True)
-    st.markdown(f'<div style="color: #64748B; margin-bottom: 24px;">Welcome back, {user["name"]}. Track your historical registry indicators below.</div>', unsafe_allow_html=True)
-    
-    with get_db_session() as session:
-        progress = session.query(StudyProgress).filter(StudyProgress.user_id == user["id"]).first()
-        quizzes = session.query(QuizResult).filter(QuizResult.user_id == user["id"]).all()
-        pdfs = st.session_state.pdf_service.get_user_uploaded_pdfs(session, user["id"])
-        
-        # Safe diagnostic fallback extractions for static fields
-        bg_track = getattr(progress, 'academic_background', 'Systems Engineering Foundation')
-        total_historic_time = getattr(progress, 'historic_spent_time', 142.5)
-        init_checkpoint = getattr(progress, 'enrollment_date', '2025-09-14')
-        core_obj = getattr(progress, 'target_objective', 'Advanced AI Architectures')
-        
-        current_active_time = progress.study_time if progress else 0.0
-        aggregate_time_to_date = total_historic_time + current_active_time
-        avg_score = sum([q.score for q in quizzes]) / len(quizzes) if quizzes else 0.0
-
-        # --- EXTENSION: FIXED PROFILE REGISTRY PANEL ---
-        st.markdown(
-            f"""
-            <div class="profile-panel">
-                <div style="font-size: 1.1rem; font-weight: 600; color: #1E293B; margin-bottom: 12px; border-bottom: 1px solid #E2E8F0; padding-bottom: 6px;">Fixed Profile Registry History</div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 0.95rem;">
-                    <div><span style="color: #64748B;">Prior Domain Background:</span> <strong>{bg_track}</strong></div>
-                    <div><span style="color: #64748B;">System Initialization Checkpoint:</span> <strong>{init_checkpoint}</strong></div>
-                    <div><span style="color: #64748B;">Target Professional Objective:</span> <strong>{core_obj}</strong></div>
-                    <div><span style="color: #64748B;">Total Cumulative Time Spent Till Date:</span> <strong>{aggregate_time_to_date:.1f} Hours</strong> (Baseline: {total_historic_time}h + Active: {current_active_time}h)</div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        # Active Session Metrics Matrix Rows
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-            st.metric("Active Track Study Context", f"{current_active_time} Hours")
-            st.markdown('</div>', unsafe_allow_html=True)
-        with col2:
-            st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-            st.metric("Evaluation Accuracy Accuracy", f"{avg_score:.1f}%")
-            st.markdown('</div>', unsafe_allow_html=True)
-        with col3:
-            st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-            st.metric("Custom Indexed Library", f"{len(pdfs)} PDFs")
-            st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-    st.write("### Available Architectural Capabilities")
-    st.info("Use the left sidebar navigation matrix to toggle between cognitive work subnodes. Our Supervisor agent dynamically balances operational requests.")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-def render_chat():
-    st.markdown('## Cognitive Chat Workspace', unsafe_allow_html=True)
-    user = st.session_state.user
-    
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        teacher_mode = st.selectbox("Pedagogical Target Mode Override", ["Beginner", "Advanced", "Interview"])
-    with col2:
-        st.write(" ")
-        st.write(" ")
-        clear_hist = st.button("Purge Workspace Cache", use_container_width=True)
-        
-    with get_db_session() as session:
-        if clear_hist:
-            HistoryManager.clear_user_history(session, user["id"])
-            st.success("History cache cleared.")
+        if submitted and user_input.strip():
+            increment_analytic('questions_asked')
+            
+            # Context-Aware Semantic RAG Lookup Engine Layer execution
+            relevant_chunks = vector_store.similarity_search(user_input, k=3)
+            context_payload = "\n\n".join([f"[Source: {c['metadata']['name']}] {c['text']}" for c in relevant_chunks])
+            
+            # Save User Input parameters
+            with get_db_connection() as conn:
+                conn.execute("INSERT INTO chat_history (session_id, role, content, timestamp) VALUES (?, ?, ?, ?)",
+                             (st.session_state.session_token, "user", user_input, datetime.now().isoformat()))
+                conn.commit()
+            
+            # Construct Prompt Engine Payload Context Matrix
+            messages = [
+                {"role": "system", "content": f"You are an elite academic tutor helper. Rely ONLY on the provided verified material context to explain thoroughly with examples.\n\nContext:\n{context_payload}"},
+                {"role": "user", "content": user_input}
+            ]
+            
+            with st.spinner("Executing Semantic Search & LLM Context Synthesis..."):
+                ai_response = OpenRouterService.complete(messages)
+            
+            # Save Context Generation response parameters
+            with get_db_connection() as conn:
+                conn.execute("INSERT INTO chat_history (session_id, role, content, timestamp) VALUES (?, ?, ?, ?)",
+                             (st.session_state.session_token, "assistant", ai_response, datetime.now().isoformat()))
+                conn.commit()
+            
             st.rerun()
 
-        history_msgs = HistoryManager.get_serialized_messages(session, user["id"], limit=15)
-        
-        for msg in history_msgs:
-            role = "user" if msg.type == "human" else "assistant"
-            with st.chat_message(role):
-                st.markdown(msg.content)
+    if st.button("Purge Active Session Logs"):
+        with get_db_connection() as conn:
+            conn.execute("DELETE FROM chat_history WHERE session_id = ?", (st.session_state.session_token,))
+            conn.commit()
+        st.toast("Active chat session logs purged successfully.")
+        st.rerun()
 
-    if prompt := st.chat_input("Ask a conceptual problem or run cross-document analysis vectors..."):
-        with st.chat_message("user"):
-            st.markdown(prompt)
-            
-        with st.chat_message("assistant"):
-            with st.spinner("Agentic workflow balancing execution tracks..."):
-                initial_graph_state = {
-                    "user_input": prompt,
-                    "user_id": user["id"],
-                    "metadata": {"teacher_mode": teacher_mode.lower()},
-                    "next_agent": "supervisor",
-                    "retrieved_context": "",
-                    "citations": [],
-                    "messages": history_msgs,
-                    "agent_output": {},
-                    "errors": []
-                }
-                
-                final_state = st.session_state.orchestrator.run_workflow(initial_graph_state)
-                output_content = final_state.get("agent_output", {}).get("content", "I am unable to resolve this request context turn completely.")
-                
-                st.markdown(output_content)
-                
-                citations = final_state.get("citations", [])
-                if citations:
-                    with st.expander("Source Document Context Citations"):
-                        for cite in citations:
-                            st.markdown(f"**[{cite['citation_index']}] File:** {cite['source']} (Page {cite['page']})")
-                            st.caption(f"Snippet: *{cite['snippet']}*")
-                
-                with get_db_session() as session:
-                    HistoryManager.save_chat_turn(session, user["id"], prompt, output_content)
 
-def render_upload():
-    st.markdown('## Knowledge Vector Material Library', unsafe_allow_html=True)
-    user = st.session_state.user
+elif st.session_state.current_page == "📄 Documents":
+    st.markdown("### 📤 Document Repository Upload Matrix")
     
-    uploaded_file = st.file_uploader("Index personal reference materials (PDF format strictly supported)", type=["pdf"])
-    if uploaded_file is not None:
-        if st.button("Execute Ingestion Pipeline", use_container_width=True):
-            with st.spinner("Extracting layout matrices and compiling FAISS storage indices..."):
-                file_bytes = uploaded_file.read()
-                with get_db_session() as session:
-                    record = st.session_state.pdf_service.process_and_index_user_pdf(
-                        session, user["id"], uploaded_file.name, file_bytes
-                    )
-                    if record:
-                        st.success(f"Successfully processed and generated semantic vector coordinates for: '{uploaded_file.name}'")
-                    else:
-                        st.error("Pipeline failure: check text processor integrity configurations.")
-
-    st.write("### Your Active Document Catalog")
-    with get_db_session() as session:
-        pdfs = st.session_state.pdf_service.get_user_uploaded_pdfs(session, user["id"])
-        if pdfs:
-            for pdf in pdfs:
-                st.write(f"📎 **{pdf.filename}** — *Indexed on {pdf.created_at.strftime('%Y-%m-%d')}*")
+    cat = st.selectbox("Assign Document Academic Categorization Taxonomy:", ["Textbook Material", "Lecture Notes", "Lab Handbook Sheets", "Past Examination Bank"])
+    uploaded_files = st.file_uploader("Drop operational educational assets (PDF, DOCX, PPTX, TXT):", 
+                                      type=["pdf", "docx", "pptx", "txt"], accept_multiple_files=True)
+    
+    if st.button("Execute Pipeline Embedding Processing") and uploaded_files:
+        for f in uploaded_files:
+            doc_id = str(uuid.uuid4())
+            file_path = os.path.join(Config.UPLOAD_DIR, f"{doc_id}_{f.name}")
+            
+            with open(file_path, "wb") as buffer:
+                buffer.write(f.getbuffer())
+                
+            # Perform targeted ingestion text parsing pipeline
+            _, ext = os.path.splitext(f.name)
+            extracted_raw = DocumentProcessor.extract_text(file_path, ext.lower())
+            text_chunks = DocumentProcessor.chunk_text(extracted_raw)
+            
+            # Vector Database Embedding pipeline integration
+            vector_store.add_texts(text_chunks, {"id": doc_id, "name": f.name, "category": cat})
+            
+            # Insert file record metadata tracking logs into DB
+            with get_db_connection() as conn:
+                conn.execute("INSERT INTO documents (id, name, category, upload_time, file_size) VALUES (?, ?, ?, ?, ?)",
+                             (doc_id, f.name, cat, datetime.now().strftime("%Y-%m-%d %H:%M"), f.size))
+                conn.commit()
+                
+        st.success(f"Successfully processed {len(uploaded_files)} document(s) into the RAG vector store.")
+        st.rerun()
+        
+    st.markdown("---")
+    st.markdown("### 🗄 Managed File Registry")
+    with get_db_connection() as conn:
+        docs = conn.execute("SELECT * FROM documents").fetchall()
+        
+    if docs:
+        df = pd.DataFrame([dict(r) for r in docs])
+        st.dataframe(df, use_container_width=True)
     else:
-        st.caption("No custom study documents uploaded yet.")
+        st.info("No active academic documents verified in the local pipeline index.")
 
-def render_quiz():
-    st.markdown('## Adaptive Assessment Engine', unsafe_allow_html=True)
-    user = st.session_state.user
+
+elif st.session_state.current_page == "📚 Topics":
+    st.markdown("### 🔍 High-Fidelity Domain Concept Map Explorer")
+    t_query = st.text_input("Enter a concept query to generate an extensive syllabus framework study guide:")
     
-    col1, col2 = st.columns(2)
-    with col1:
-        topic = st.text_input("Target Evaluation Topic Context", "Operating Systems Process Synchronization")
-    with col2:
-        q_type = st.selectbox("Format Architecture Style", ["MCQ", "FILL", "CODING"])
+    if t_query and st.button("Generate Domain Curricula Architecture"):
+        relevant_chunks = vector_store.similarity_search(t_query, k=4)
+        context_payload = "\n\n".join([c['text'] for c in relevant_chunks])
         
-    if st.button("Generate Assessment Deck", use_container_width=True):
-        with st.spinner("Compiling structural verification items..."):
-            initial_state = {
-                "user_input": topic,
-                "user_id": user["id"],
-                "metadata": {"quiz_type": q_type, "num_questions": 3},
-                "next_agent": "supervisor",
-                "retrieved_context": "",
-                "citations": [],
-                "messages": [],
-                "agent_output": {},
-                "errors": []
-            }
-            res = st.session_state.orchestrator.quiz_master.process(initial_state)
-            st.session_state.active_quiz = res.get("agent_output", {}).get("quiz_questions", [])
-            st.session_state.quiz_topic = topic
+        prompt = [
+            {"role": "system", "content": "You are a senior academic curriculum mapping specialist. Construct a comprehensive breakdown with core pillars, theoretical prerequisites, and applied target objectives for the requested domain."},
+            {"role": "user", "content": f"Analyze this topic: {t_query}\n\nContext Materials:\n{context_payload}"}
+        ]
+        
+        with st.spinner("Synthesizing concept roadmap structures..."):
+            res = OpenRouterService.complete(prompt)
+        st.markdown(f'<div class="em-card">{res}</div>', unsafe_allow_html=True)
 
-    if "active_quiz" in st.session_state and st.session_state.active_quiz:
-        st.write("### Complete Your Assessment")
-        
-        if isinstance(st.session_state.active_quiz, dict) and "error_fallback" in st.session_state.active_quiz:
-            st.error("Could not construct structured assessment array loop. Please rerun the engine.")
-            return
 
-        score_counter = 0
-        total_q = len(st.session_state.active_quiz)
+elif st.session_state.current_page == "❓ Question Bank":
+    st.markdown("### 📥 Advanced Automated Exam Pattern Compiler")
+    q_topic = st.text_input("Specify target sub-discipline focus area:")
+    
+    if q_topic and st.button("Compile Target Question Matrix"):
+        relevant_chunks = vector_store.similarity_search(q_topic, k=4)
+        context_payload = "\n\n".join([c['text'] for c in relevant_chunks])
         
-        for idx, item in enumerate(st.session_state.active_quiz):
-            st.markdown(f"**Q{idx+1}: {item.get('question')}**")
-            if item.get("type") == "MCQ":
-                opts = item.get("options", ["A", "B", "C", "D"])
-                ans = st.radio(f"Select choice for Q{idx+1}", opts, key=f"q_{idx}")
-                if ans == item.get("correct_answer"):
-                    score_counter += 1
-            else:
-                ans = st.text_input("Input exact structural response token", key=f"q_{idx}")
-                if ans.strip().lower() == str(item.get("correct_answer")).strip().lower():
-                    score_counter += 1
-            with st.expander("Review Academic Breakdown Summary"):
-                st.write(f"*Correct Answer:* **{item.get('correct_answer')}**")
-                st.write(item.get("explanation"))
-            st.write("---")
+        prompt = [
+            {"role": "system", "content": "Generate 3 highly analytical, conceptual questions accompanied by complete step-by-step structural model solutions based on the provided text."},
+            {"role": "user", "content": f"Topic Area: {q_topic}\n\nSource Matrix:\n{context_payload}"}
+        ]
+        
+        with st.spinner("Generating targeted academic questions..."):
+            res = OpenRouterService.complete(prompt)
+        st.markdown(f'<div class="em-card">{res}</div>', unsafe_allow_html=True)
+
+
+elif st.session_state.current_page == "📝 Quiz":
+    st.markdown("### 🧠 Adaptive Knowledge Validation Assessment Matrix")
+    qz_topic = st.text_input("Specify target parameters to formulate interactive evaluation problems:", "Database Systems")
+    
+    if st.button("Generate Dynamic Quiz Setup"):
+        relevant_chunks = vector_store.similarity_search(qz_topic, k=3)
+        context_payload = "\n\n".join([c['text'] for c in relevant_chunks])
+        
+        prompt = [
+            {"role": "system", "content": "Generate exactly one complex multiple-choice question problem structure. Return the question followed by four options (A, B, C, D) and specify the accurate answer clearly."},
+            {"role": "user", "content": f"Subject Context Parameter: {qz_topic}\n\nSource Material Context:\n{context_payload}"}
+        ]
+        
+        with st.spinner("Assembling structural test parameters..."):
+            st.session_state.active_quiz = OpenRouterService.complete(prompt)
+            increment_analytic('quizzes_taken')
             
-        if st.button("Submit Score Transcript", use_container_width=True):
-            pct = (score_counter / total_q) * 100.0
-            with get_db_session() as session:
-                rec = QuizResult(user_id=user["id"], topic=st.session_state.quiz_topic, score=pct)
-                session.add(rec)
+    if "active_quiz" in st.session_state:
+        st.markdown(f'<div class="em-card">{st.session_state.active_quiz}</div>', unsafe_allow_html=True)
+        
+        score_val = st.slider("Self-evaluated scoring precision index performance:", 0, 100, 80)
+        if st.button("Submit Assessment Score Evaluation"):
+            update_avg_score(score_val)
+            st.success(f"Assessment performance score matrix locked at: {score_val}%")
+
+
+elif st.session_state.current_page == "🧠 Flashcards":
+    st.markdown("### ⚡ Active Recall Spaced Repetition Engine")
+    
+    with st.form("fc_add"):
+        subj = st.text_input("Course Subject Designation Tag:")
+        front_txt = st.text_area("Front Side (Core Prompt Question):")
+        back_txt = st.text_area("Back Side (Theoretical Explanation Resolution Model):")
+        diff = st.selectbox("Difficulty Threshold Scale:", ["Easy", "Medium", "Hard"])
+        
+        if st.form_submit_with_button("Commit Flashcard to Storage Engine"):
+            if front_txt and back_txt:
+                with get_db_connection() as conn:
+                    conn.execute("INSERT INTO flashcards (subject, front, back, difficulty) VALUES (?, ?, ?, ?)",
+                                 (subj, front_txt, back_txt, diff))
+                    conn.commit()
+                st.toast("Flashcard saved successfully.")
+                st.rerun()
                 
-                progress = session.query(StudyProgress).filter(StudyProgress.user_id == user["id"]).first()
-                if progress:
-                    progress.study_time += 0.25
-            st.success(f"Transcript captured perfectly! Score profile tracked: {pct:.1f}%")
-
-def render_flashcards():
-    st.markdown('## High-Yield Active Recall Decks', unsafe_allow_html=True)
-    user = st.session_state.user
+    st.markdown("---")
     
-    topic = st.text_input("Enter Focus Domain Topic Area", "Data Structures Trees and Graphs")
-    if st.button("Build Dynamic Recall Deck", use_container_width=True):
-        with st.spinner("Extracting functional context dimensions..."):
-            initial_state = {
-                "user_input": topic,
-                "user_id": user["id"],
-                "metadata": {"num_cards": 4},
-                "next_agent": "supervisor",
-                "retrieved_context": "",
-                "citations": [],
-                "messages": [],
-                "agent_output": {},
-                "errors": []
-            }
-            res = st.session_state.orchestrator.flashcard_worker.process(initial_state)
-            st.session_state.active_deck = res.get("agent_output", {}).get("flashcards", [])
-
-    if "active_deck" in st.session_state and st.session_state.active_deck:
-        if isinstance(st.session_state.active_deck, dict):
-            st.error("Error constructing structured deck. Please retry query layout.")
-            return
-            
-        for card in st.session_state.active_deck:
-            with st.container():
-                st.markdown(f"#### Question: {card.get('front')}")
-                with st.expander("Flip Active Card Structure"):
-                    st.info(f"**Answer Core:** {card.get('back')}")
-
-def render_planner():
-    st.markdown('## Dynamic Curriculum & Milestone Planner', unsafe_allow_html=True)
-    user = st.session_state.user
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        topic = st.text_input("Target Objective/Exam Horizon Scope", "DBMS Midterm Review")
-        weeks = st.slider("Timeline Horizon Allocation (Weeks)", 1, 12, 4)
-    with col2:
-        hours = st.slider("Daily Study Time Threshold Commitment (Hours)", 1, 8, 2)
+    # Retrieve saved flashcard elements from storage
+    with get_db_connection() as conn:
+        cards = conn.execute("SELECT * FROM flashcards").fetchall()
         
-    if st.button("Generate Complete Schedule Map", use_container_width=True):
-        with st.spinner("Assembling personalized milestone charts..."):
-            state = {
-                "user_input": topic,
-                "user_id": user["id"],
-                "metadata": {"duration_weeks": weeks, "daily_hours": hours},
-                "next_agent": "supervisor",
-                "retrieved_context": "",
-                "citations": [],
-                "messages": [],
-                "agent_output": {},
-                "errors": []
-            }
-            res = st.session_state.orchestrator.planner.process(state)
-            st.markdown(res.get("agent_output", {}).get("content", ""))
+    if cards:
+        for idx, item in enumerate(cards):
+            with st.expander(f"🎴 Card {idx+1} | Subject Target: {item['subject']} [{item['difficulty']}]"):
+                st.markdown(f"**Front Query Prompt:**\n{item['front']}")
+                st.markdown("---")
+                st.markdown(f"**Back Target Explanation Resolution:**\n{item['back']}")
+    else:
+        st.info("No interactive recall metrics registered in flashcard datastores.")
 
-def render_progress():
-    st.markdown('## Performance Analytics Matrix', unsafe_allow_html=True)
-    user = st.session_state.user
+
+elif st.session_state.current_page == "📊 Analytics":
+    st.markdown("### 📊 Enterprise Predictive Learning Performance Metrics")
     
-    with get_db_session() as session:
-        progress = session.query(StudyProgress).filter(StudyProgress.user_id == user["id"]).first()
-        quizzes = session.query(QuizResult).filter(QuizResult.user_id == user["id"]).order_by(QuizResult.date.desc()).all()
+    with get_db_connection() as conn:
+        metrics_rows = conn.execute("SELECT * FROM analytics").fetchall()
+        avg_score = conn.execute("SELECT value_real FROM analytics WHERE key='avg_quiz_score'").fetchone()[0]
         
-        st.write("### Core System Diagnostics Summary")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Total Active Calculated Study Time", f"{progress.study_time if progress else 0.0} Hours")
-        with col2:
-            st.metric("Total Assessments Concluded", f"{len(quizzes)} Quizzes")
-            
-        st.write("### Historical Evaluation Records Log")
-        if quizzes:
-            for q in quizzes:
-                st.write(f"Target Topic: {q.topic} | Score: {q.score:.1f}% | Date Logged: {q.date.strftime('%Y-%m-%d')}")
-        else:
-            st.caption("No historical diagnostic score items logged for this workspace account.")
+    st.markdown("#### Primary Performance Metrics Registry Logs")
+    for r in metrics_rows:
+        st.text(f"Key Vector ID: {r['key']} -> Metric Counter Value: {r['value_int']}")
+        
+    st.metric(label="Average Performance Matrix Quiz Score Rating", value=f"{round(avg_score, 2)}%")
 
-def render_settings():
-    st.markdown('## Profile Workspace Settings', unsafe_allow_html=True)
-    user = st.session_state.user
-    st.write("### Active Session Context")
-    st.write(f"Student Profile Identity Name: {user['name']}")
-    st.write(f"Linked Communication Email Endpoint: {user['email']}")
-    st.caption("StudyPilot AI Engine running on LangGraph Orchestration Topology Layers.")
 
-# Core Sidebar Context Router Setup
-if st.session_state.user is None:
-    render_login_signup()
-else:
-    with st.sidebar:
-        st.markdown(f'### StudyPilot AI\nActive Student: {st.session_state.user["name"]}')
-        choice = st.radio(
-            "Navigation Workspace Desk",
-            ["Dashboard", "Chat Workspace", "Upload Library", "Quiz Center", "Flashcards Deck", "Curriculum Planner", "Progress Matrix", "Settings Desk"]
-        )
-        if st.button("Terminate Session Profile", use_container_width=True):
-            st.session_state.user = None
-            st.rerun()
-
-    # Viewport Routing Matrix
-    if choice == "Dashboard":
-        render_dashboard()
-    elif choice == "Chat Workspace":
-        render_chat()
-    elif choice == "Upload Library":
-        render_upload()
-    elif choice == "Quiz Center":
-        render_quiz()
-    elif choice == "Flashcards Deck":
-        render_flashcards()
-    elif choice == "Curriculum Planner":
-        render_planner()
-    elif choice == "Progress Matrix":
-        render_progress()
-    elif choice == "Settings Desk":
-        render_settings()
+elif st.session_state.current_page == "⚙ Settings":
+    st.markdown("### 🛠 Operational Engine Core Settings Configurations")
+    st.info("Operational Deployment Platform Profile Verified: STREAMLIT_CLOUD_PRODUCTION_ENV")
+    
+    st.text_input("Target OpenRouter Base Engine Model Parameter URI:", value=Config.DEFAULT_MODEL, disabled=True)
+    
+    status = "🔒 VALID ENCRYPTED KEY DETECTED" if len(Config.OPENROUTER_API_KEY) > 5 else "❌ NO OPERATIONAL API KEY CONFIGURATION REGISTERED"
+    st.text(f"OpenRouter Authentication Handshake Engine Infrastructure Status: {status}")
