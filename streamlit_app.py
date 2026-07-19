@@ -15,97 +15,99 @@ from utils.logger import logger
 
 # Initialize foundational app configurations
 st.set_page_config(
-    page_title="StudyPilot AI - Agentic AI Study Assistant",
+    page_title="StudyPilot AI",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Clean & Professional Butter Yellow + Light SaaS Theme
+# Minimalist Pastel Butter-Cream & Soft Slate UI Engineering Sheet
 st.markdown("""
     <style>
-    /* Main Background & Base Text */
+    /* Main Layout Viewport */
     .stApp {
-        background-color: #FFFFFF;
-        color: #1E293B;
+        background-color: #FCFBF7;
+        color: #334155;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     
-    /* Content Containers & Cards - Soft Butter Yellow / Cream Tint */
+    /* Global Container Reset: Stop default Streamlit structural layouts from drawing borders */
     div[data-testid="stVerticalBlock"] > div {
-        background-color: #FFFDF0;
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 16px;
-        border: 1px solid #FEF08A;
-        box-shadow: 0 4px 6px -1px rgba(254, 240, 138, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        background-color: transparent !important;
+        border: none !important;
+        padding: 0px !important;
+        margin-bottom: 0px !important;
+        box-shadow: none !important;
     }
     
-    /* Navigation Sidebar Style - Crisp Light Grey / Warm Tint */
-    section[data-testid="stSidebar"] {
-        background-color: #F8FAFC !important;
-        border-right: 1px solid #E2E8F0;
-    }
-    
-    /* Login Form Card Alignment Wrapper */
-    .auth-card {
-        background-color: #FFFDF0;
-        border: 1px solid #FEF08A;
-        border-radius: 16px;
-        padding: 32px;
-        box-shadow: 0 10px 15px -3px rgba(254, 240, 138, 0.3);
-        margin-bottom: 20px;
-    }
-    
-    /* Action Buttons - Warm Gold / Amber Accent */
-    .stButton>button {
-        background-color: #EAB308 !important; /* Butter Yellow Accent Gold */
-        color: #FFFFFF !important;
+    /* Explicitly scoped card classes for intended UI widgets only */
+    .custom-card {
+        background-color: #FFFDF0 !important;
+        border: 1px solid #EAE4B8 !important;
         border-radius: 8px !important;
+        padding: 20px !important;
+        margin-bottom: 16px !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    }
+    
+    /* Left Navigation Menu Sidebar Layout */
+    section[data-testid="stSidebar"] {
+        background-color: #F7F5EB !important;
+        border-right: 1px solid #EAE4B8 !important;
+    }
+    
+    /* Clean Centered Action Passport Box */
+    .auth-box {
+        background-color: #FFFDF0;
+        border: 1px solid #EAE4B8;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        margin-top: 40px;
+    }
+    
+    /* SaaS Primary Buttons - Soft Charcoal / Amber Hover Interaction */
+    .stButton>button {
+        background-color: #D9A714 !important;
+        color: #FFFFFF !important;
+        border-radius: 6px !important;
         border: none !important;
         font-weight: 600 !important;
-        padding: 10px 24px !important;
+        padding: 8px 20px !important;
         transition: all 0.2s ease;
     }
     .stButton>button:hover {
-        background-color: #CA8A04 !important; /* Darker Amber */
-        box-shadow: 0 0 12px rgba(234, 179, 8, 0.4);
+        background-color: #B88E10 !important;
         transform: translateY(-1px);
     }
     
-    /* Input Form Elements styling */
+    /* Clear Text Area Controls */
     input, textarea, select {
         background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        border: 1px solid #E2E8F0 !important;
-        border-radius: 8px !important;
-        padding: 10px !important;
+        color: #1E293B !important;
+        border: 1px solid #CBD5E1 !important;
+        border-radius: 6px !important;
     }
     input:focus, textarea:focus {
-        border-color: #EAB308 !important;
-        box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.2) !important;
+        border-color: #D9A714 !important;
+        box-shadow: 0 0 0 2px rgba(217, 167, 20, 0.15) !important;
     }
     
-    /* Metrics Layout Settings */
+    /* Premium High-Density Analytics Metric Typography */
     div[data-testid="stMetricValue"] {
-        color: #CA8A04 !important;
+        color: #B88E10 !important;
         font-weight: 700;
-        font-size: 2.3rem !important;
+        font-size: 2rem !important;
     }
     div[data-testid="stMetricLabel"] {
         color: #64748B !important;
-        font-size: 0.9rem !important;
+        font-size: 0.85rem !important;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
     
-    /* Chat bubbles text color alignment override */
-    div[data-testid="stChatMessage"] {
-        background-color: #F8FAFC !important;
-        border: 1px solid #E2E8F0 !important;
-    }
-    
+    /* Explicitly hide standard horizontal rules to clean up extra lines */
     hr {
-        border-top: 1px solid #FEF08A !important;
+        display: none !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -122,21 +124,20 @@ if "initialized" not in st.session_state:
     logger.info("Application infrastructure states fully hydrated.")
 
 def render_login_signup():
-    # Asymmetric column strategy to cleanly center the form without nested box issues
     _, center_col, _ = st.columns([1, 1.2, 1])
     
     with center_col:
         st.markdown(
             """
-            <div class="auth-card">
-                <div style="font-size: 2.25rem; font-weight: 800; color: #1E293B; letter-spacing: -0.025em; margin-bottom: 4px;">✈️ StudyPilot AI</div>
-                <div style="color: #64748B; font-size: 0.95rem;">Intelligent Agentic Academic Workspace</div>
+            <div class="auth-box">
+                <div style="font-size: 2rem; font-weight: 700; color: #1E293B; letter-spacing: -0.025em; margin-bottom: 2px;">StudyPilot AI</div>
+                <div style="color: #64748B; font-size: 0.9rem; margin-bottom: 20px;">Intelligent Agentic Academic Workspace</div>
             </div>
             """, 
             unsafe_allow_html=True
         )
         
-        tab1, tab2 = st.tabs(["🔒 Secure Login", "📝 Create Account"])
+        tab1, tab2 = st.tabs(["Secure Login", "Create Account"])
         
         with tab1:
             st.write(" ")
@@ -161,7 +162,7 @@ def render_login_signup():
             st.write(" ")
             if st.button("Register & Initialize Profile", use_container_width=True):
                 if not reg_name or not reg_email or not reg_password:
-                    st.warning("All tracking data fields are strictly required.")
+                    st.warning("All data fields are strictly required.")
                 else:
                     with get_db_session() as session:
                         new_user = AuthManager.register_user(session, reg_name, reg_email, reg_password)
@@ -172,9 +173,8 @@ def render_login_signup():
 
 def render_dashboard():
     user = st.session_state.user
-    st.markdown(f"## 📊 Academic Workspace Overview")
-    st.markdown(f"Welcome back, **{user['name']}**. Track your real-time analytics indicators below.")
-    st.markdown("---")
+    st.markdown(f'<div style="font-size: 1.75rem; font-weight: 700; color: #1E293B; margin-bottom: 4px;">Academic Workspace Overview</div>', unsafe_allow_html=True)
+    st.markdown(f'<div style="color: #64748B; margin-bottom: 24px;">Welcome back, {user["name"]}. Track your real-time analytics indicators below.</div>', unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     
@@ -186,17 +186,25 @@ def render_dashboard():
         avg_score = sum([q.score for q in quizzes]) / len(quizzes) if quizzes else 0.0
         
         with col1:
+            st.markdown('<div class="custom-card">', unsafe_allow_html=True)
             st.metric("Total Study Context", f"{progress.study_time if progress else 0.0} Hours")
+            st.markdown('</div>', unsafe_allow_html=True)
         with col2:
+            st.markdown('<div class="custom-card">', unsafe_allow_html=True)
             st.metric("Evaluation Accuracy", f"{avg_score:.1f}%")
+            st.markdown('</div>', unsafe_allow_html=True)
         with col3:
+            st.markdown('<div class="custom-card">', unsafe_allow_html=True)
             st.metric("Custom Indexed Library", f"{len(pdfs)} PDFs")
+            st.markdown('</div>', unsafe_allow_html=True)
 
+    st.markdown('<div class="custom-card">', unsafe_allow_html=True)
     st.write("### Available Architectural Capabilities")
-    st.info("💡 **Pro-Tip**: Use the left sidebar navigation matrix to toggle between cognitive work subnodes. Our Supervisor agent dynamically balances operational requests.")
+    st.info("Use the left sidebar navigation matrix to toggle between cognitive work subnodes. Our Supervisor agent dynamically balances operational requests.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def render_chat():
-    st.markdown("## 💬 Cognitive Chat Workspace")
+    st.markdown('## Cognitive Chat Workspace', unsafe_allow_html=True)
     user = st.session_state.user
     
     col1, col2 = st.columns([3, 1])
@@ -245,7 +253,7 @@ def render_chat():
                 
                 citations = final_state.get("citations", [])
                 if citations:
-                    with st.expander("📄 Source Document Context Citations"):
+                    with st.expander("Source Document Context Citations"):
                         for cite in citations:
                             st.markdown(f"**[{cite['citation_index']}] File:** {cite['source']} (Page {cite['page']})")
                             st.caption(f"Snippet: *{cite['snippet']}*")
@@ -254,7 +262,7 @@ def render_chat():
                     HistoryManager.save_chat_turn(session, user["id"], prompt, output_content)
 
 def render_upload():
-    st.markdown("## 📁 Knowledge Vector Material Library")
+    st.markdown('## Knowledge Vector Material Library', unsafe_allow_html=True)
     user = st.session_state.user
     
     uploaded_file = st.file_uploader("Index personal reference materials (PDF format strictly supported)", type=["pdf"])
@@ -271,7 +279,6 @@ def render_upload():
                     else:
                         st.error("Pipeline failure: check text processor integrity configurations.")
 
-    st.write("---")
     st.write("### Your Active Document Catalog")
     with get_db_session() as session:
         pdfs = st.session_state.pdf_service.get_user_uploaded_pdfs(session, user["id"])
@@ -282,7 +289,7 @@ def render_upload():
             st.caption("No custom study documents uploaded yet.")
 
 def render_quiz():
-    st.markdown("## 🎯 Adaptive Assessment Engine")
+    st.markdown('## Adaptive Assessment Engine', unsafe_allow_html=True)
     user = st.session_state.user
     
     col1, col2 = st.columns(2)
@@ -346,7 +353,7 @@ def render_quiz():
             st.success(f"Transcript captured perfectly! Score profile tracked: {pct:.1f}%")
 
 def render_flashcards():
-    st.markdown("## ⚡ High-Yield Active Recall Decks")
+    st.markdown('## High-Yield Active Recall Decks', unsafe_allow_html=True)
     user = st.session_state.user
     
     topic = st.text_input("Enter Focus Domain Topic Area", "Data Structures Trees and Graphs")
@@ -373,13 +380,12 @@ def render_flashcards():
             
         for card in st.session_state.active_deck:
             with st.container():
-                st.markdown(f"#### ❔ Question: {card.get('front')}")
-                with st.expander("🔄 Flip Active Card Structure"):
+                st.markdown(f"#### Question: {card.get('front')}")
+                with st.expander("Flip Active Card Structure"):
                     st.info(f"**Answer Core:** {card.get('back')}")
-                st.markdown("---")
 
 def render_planner():
-    st.markdown("## 📅 Dynamic Curriculum & Milestone Planner")
+    st.markdown('## Dynamic Curriculum & Milestone Planner', unsafe_allow_html=True)
     user = st.session_state.user
     
     col1, col2 = st.columns(2)
@@ -406,7 +412,7 @@ def render_planner():
             st.markdown(res.get("agent_output", {}).get("content", ""))
 
 def render_progress():
-    st.markdown("## 📈 Performance Analytics Matrix")
+    st.markdown('## Performance Analytics Matrix', unsafe_allow_html=True)
     user = st.session_state.user
     
     with get_db_session() as session:
@@ -420,21 +426,19 @@ def render_progress():
         with col2:
             st.metric("Total Assessments Concluded", f"{len(quizzes)} Quizzes")
             
-        st.write("---")
         st.write("### Historical Evaluation Records Log")
         if quizzes:
             for q in quizzes:
-                st.write(f"🎯 **Topic Target:** {q.topic} | **Score:** `{q.score:.1f}%` | *Date Logged:* {q.date.strftime('%Y-%m-%d')}")
+                st.write(f"Target Topic: {q.topic} | Score: {q.score:.1f}% | Date Logged: {q.date.strftime('%Y-%m-%d')}")
         else:
             st.caption("No historical diagnostic score items logged for this workspace account.")
 
 def render_settings():
-    st.markdown("## ⚙️ Profile Workspace Settings")
+    st.markdown('## Profile Workspace Settings', unsafe_allow_html=True)
     user = st.session_state.user
     st.write("### Active Session Context")
-    st.write(f"- **Student Profile Identity Name:** {user['name']}")
-    st.write(f"- **Linked Communication Email Endpoint:** {user['email']}")
-    st.markdown("---")
+    st.write(f"Student Profile Identity Name: {user['name']}")
+    st.write(f"Linked Communication Email Endpoint: {user['email']}")
     st.caption("StudyPilot AI Engine running on LangGraph Orchestration Topology Layers.")
 
 # Core Sidebar Context Router Setup
@@ -442,18 +446,16 @@ if st.session_state.user is None:
     render_login_signup()
 else:
     with st.sidebar:
-        st.markdown(f"### ✈️ StudyPilot AI\n**Active Student:** {st.session_state.user['name']}")
-        st.markdown("---")
+        st.markdown(f'### StudyPilot AI\nActive Student: {st.session_state.user["name"]}')
         choice = st.radio(
             "Navigation Workspace Desk",
             ["Dashboard", "Chat Workspace", "Upload Library", "Quiz Center", "Flashcards Deck", "Curriculum Planner", "Progress Matrix", "Settings Desk"]
         )
-        st.markdown("---")
         if st.button("Terminate Session Profile", use_container_width=True):
             st.session_state.user = None
             st.rerun()
 
-    # Viewport Routing
+    # Viewport Routing Matrix
     if choice == "Dashboard":
         render_dashboard()
     elif choice == "Chat Workspace":
