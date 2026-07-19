@@ -18,18 +18,16 @@ class VectorStoreFactory:
         """
         self.api_key = os.getenv("OPENAI_API_KEY")
         self.embedding_model = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-        
-        # Determine if base routing modifications are required (e.g. for OpenRouter endpoints)
-        # Note: If OpenRouter lacks text embedding support, fallback to standard OpenAI URL if needed
         self.api_base = os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1")
         
-        logger.info(f"Initializing OpenAIEmbeddings with model={self.embedding_model}")
+        logger.info(f"Initializing OpenAIEmbeddings with model={self.embedding_model} via base={self.api_base}")
         
         try:
+            # Explicit parameters mapping directly to the configured endpoint context
             self.embeddings = OpenAIEmbeddings(
                 model=self.embedding_model,
                 openai_api_key=self.api_key,
-                openai_api_base=self.api_base if "openrouter.ai" not in self.api_base else "https://api.openai.com/v1"
+                openai_api_base=self.api_base
             )
         except Exception as e:
             logger.error(f"Failed to instantiate OpenAIEmbeddings client engine: {str(e)}", exc_info=True)

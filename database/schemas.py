@@ -71,12 +71,16 @@ class QuizResult(Base):
 
 class StudyProgress(Base):
     __tablename__ = "study_progress"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
-    completed_topics = Column(Text, default="", nullable=False)  # Comma-separated or serialized string data
-    weak_topics = Column(Text, default="", nullable=False)       # Comma-separated or serialized string data
-    study_time = Column(Float, default=0.0, nullable=False)       # Total calculated hours spent
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    study_time = Column(Float, default=0.0)  # Current active hours
+    
+    # Fixed historical baseline tracking metrics
+    academic_background = Column(String(255), default="Not Configured")
+    historic_spent_time = Column(Float, default=0.0)
+    enrollment_date = Column(String(50), default="2026-01-01")
+    target_objective = Column(String(255), default="General Development")
 
     # Relationships
     user = relationship("User", back_populates="progress")
