@@ -1,0 +1,23 @@
+# ---- Core ----
+streamlit==1.40.2
+python-dotenv==1.0.1
+requests==2.32.3
+
+# ---- RAG / embeddings / vector search ----
+sentence-transformers==3.3.1
+faiss-cpu==1.9.0
+langchain-text-splitters==0.3.4
+numpy==1.26.4
+
+# Pin CPU-only torch so Streamlit Cloud does not pull the ~2GB CUDA build.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1
+
+# ---- Document parsing ----
+PyPDF2==3.0.1
+python-docx==1.1.2
+python-pptx==1.0.2
+
+# ---- Data & charts ----
+pandas==2.2.3
+plotly==5.24.1
