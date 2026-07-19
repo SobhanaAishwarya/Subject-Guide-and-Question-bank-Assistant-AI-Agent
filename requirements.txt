@@ -1,0 +1,23 @@
+# Core Web and UI
+streamlit==1.42.0
+streamlit-option-menu==0.4.0
+
+# Database and Security
+SQLAlchemy==2.0.38
+bcrypt==4.2.1
+
+# AI, LLM, and Graph Frameworks
+openai==1.63.0
+langchain==0.3.18
+langchain-openai==0.3.6
+langchain-community==0.3.17
+langgraph==0.2.74
+
+# Vector Store and Math Processing
+faiss-cpu==1.10.0
+numpy==1.26.4
+pymupdf==1.25.3
+
+# Utilities and Environment
+python-dotenv==1.0.1
+pydantic==2.10.6
