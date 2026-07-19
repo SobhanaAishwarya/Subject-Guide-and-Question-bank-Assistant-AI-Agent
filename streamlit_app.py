@@ -15,55 +15,107 @@ from utils.logger import logger
 
 # Initialize foundational app configurations
 st.set_page_config(
-    page_title="agentic_ai_clean | Advanced Study Assistant",
-    page_icon="✈️",
+    page_title="StudyPilot AI - Agentic AI Study Assistant",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Apply sleek production-grade deep dark theme CSS overrides
+# Premium Modern SaaS Dark Theme CSS (Refined Deep Slate & Vivid Sky Blue Accents)
 st.markdown("""
     <style>
-    /* Main layout colors */
+    /* Main Layout Base */
     .stApp {
-        background-color: #0E1117;
-        color: #E2E8F0;
+        background-color: #0B0F19;
+        color: #F1F5F9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    /* Round up card boxes and containers */
+    
+    /* Clean Cards & Structural Dynamic Containers */
     div[data-testid="stVerticalBlock"] > div {
-        background-color: #1A1D24;
+        background-color: #111827;
         border-radius: 12px;
-        padding: 18px;
-        margin-bottom: 12px;
-        border: 1px solid #2D3748;
+        padding: 24px;
+        margin-bottom: 16px;
+        border: 1px solid #1F2937;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
     }
-    /* Buttons custom styling */
+    
+    /* Left Navigation Sidebar Override */
+    section[data-testid="stSidebar"] {
+        background-color: #0F172A !important;
+        border-right: 1px solid #1E293B;
+    }
+    
+    /* Constrain and Center the Authentication Screen Block Layout */
+    .auth-container {
+        max-width: 460px;
+        margin: 60px auto;
+        padding: 36px;
+        background-color: #111827;
+        border-radius: 16px;
+        border: 1px solid #1F2937;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Buttons Custom Action Styling */
     .stButton>button {
-        background-color: #4F46E5 !important;
-        color: white !important;
+        background-color: #0EA5E9 !important; /* Premium Sky Blue */
+        color: #FFFFFF !important;
         border-radius: 8px !important;
         border: none !important;
         font-weight: 600 !important;
-        transition: all 0.3s ease;
+        padding: 10px 24px !important;
+        transition: all 0.2s ease-in-out;
     }
     .stButton>button:hover {
-        background-color: #6366F1 !important;
+        background-color: #0284C7 !important; /* Deeper Ocean Blue */
+        box-shadow: 0 0 16px rgba(14, 165, 233, 0.4);
         transform: translateY(-1px);
     }
-    /* Text inputs styling */
-    input, textarea {
-        background-color: #0E1117 !important;
-        color: #E2E8F0 !important;
-        border: 1px solid #4A5568 !important;
-        border-radius: 6px !important;
+    
+    /* Input Fields Accent Refinements */
+    input, textarea, select {
+        background-color: #1F2937 !important;
+        color: #F8FAFC !important;
+        border: 1px solid #374151 !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
     }
-    /* Metric label styling */
+    input:focus, textarea:focus {
+        border-color: #0EA5E9 !important;
+        box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2) !important;
+    }
+    
+    /* Balanced Metrics Design Matrix */
     div[data-testid="stMetricValue"] {
-        color: #10B981 !important;
+        color: #38BDF8 !important; /* Cyber Sky Accent */
         font-weight: 700;
+        font-size: 2.4rem !important;
+        letter-spacing: -0.025em;
     }
+    div[data-testid="stMetricLabel"] {
+        color: #94A3B8 !important;
+        font-size: 0.95rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    /* Custom Decorative Clean Badge Lines */
+    .hero-title {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: #F8FAFC;
+        letter-spacing: -0.025em;
+        margin-bottom: 4px;
+    }
+    .hero-subtitle {
+        color: #94A3B8;
+        font-size: 1.05rem;
+        margin-bottom: 24px;
+    }
+    
     hr {
-        border-top: 1px solid #2D3748 !important;
+        border-top: 1px solid #1F2937 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -80,44 +132,53 @@ if "initialized" not in st.session_state:
     logger.info("Application infrastructure states fully hydrated.")
 
 def render_login_signup():
-    st.title("✈️ agentic_ai_clean")
-    st.subheader("Your Intelligent Agentic AI Study Assistant")
+    # Use asymmetric structural column spacing to center layout cleanly
+    _, center_col, _ = st.columns([1, 1.25, 1])
     
-    tab1, tab2 = st.tabs(["🔒 Secure Login", "📝 Create Account"])
-    
-    with tab1:
-        st.write("### Sign In")
-        login_email = st.text_input("Email Address", key="login_email")
-        login_password = st.text_input("Password", type="password", key="login_password")
-        if st.button("Authenticate Session"):
-            with get_db_session() as session:
-                user = AuthManager.authenticate_user(session, login_email, login_password)
-                if user:
-                    st.session_state.user = {"id": user.id, "name": user.name, "email": user.email}
-                    st.success(f"Welcome back, {user.name}!")
-                    st.rerun()
-                else:
-                    st.error("Invalid email payload coordinates or password match.")
-
-    with tab2:
-        st.write("### Sign Up")
-        reg_name = st.text_input("Full Name", key="reg_name")
-        reg_email = st.text_input("Email Address", key="reg_email")
-        reg_password = st.text_input("Password", type="password", key="reg_password")
-        if st.button("Register & Initialize Profile"):
-            if not reg_name or not reg_email or not reg_password:
-                st.warning("All verification text fields are strictly required.")
-            else:
+    with center_col:
+        st.markdown('<div class="auth-container">', unsafe_allow_html=True)
+        st.markdown('<div class="hero-title">✈️ StudyPilot AI</div>', unsafe_allow_html=True)
+        st.markdown('<div class="hero-subtitle">Intelligent Agentic Study Workspace</div>', unsafe_allow_html=True)
+        
+        tab1, tab2 = st.tabs(["🔒 Secure Login", "📝 Create Account"])
+        
+        with tab1:
+            st.write(" ")
+            login_email = st.text_input("Email Address", key="login_email")
+            login_password = st.text_input("Password", type="password", key="login_password")
+            st.write(" ")
+            if st.button("Authenticate Session", use_container_width=True):
                 with get_db_session() as session:
-                    new_user = AuthManager.register_user(session, reg_name, reg_email, reg_password)
-                    if new_user:
-                        st.success("Account initialized successfully! Please sign in above.")
+                    user = AuthManager.authenticate_user(session, login_email, login_password)
+                    if user:
+                        st.session_state.user = {"id": user.id, "name": user.name, "email": user.email}
+                        st.success(f"Welcome back, {user.name}!")
+                        st.rerun()
                     else:
-                        st.error("Registration rejected: Email target address may be already registered.")
+                        st.error("Invalid email coordinates or password match.")
+
+        with tab2:
+            st.write(" ")
+            reg_name = st.text_input("Full Name", key="reg_name")
+            reg_email = st.text_input("Email Address", key="reg_email")
+            reg_password = st.text_input("Password", type="password", key="reg_password")
+            st.write(" ")
+            if st.button("Register & Initialize Profile", use_container_width=True):
+                if not reg_name or not reg_email or not reg_password:
+                    st.warning("All tracking data fields are strictly required.")
+                else:
+                    with get_db_session() as session:
+                        new_user = AuthManager.register_user(session, reg_name, reg_email, reg_password)
+                        if new_user:
+                            st.success("Account initialized successfully! Please sign in.")
+                        else:
+                            st.error("Registration rejected: Target email already registered.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 def render_dashboard():
     user = st.session_state.user
-    st.title(f"📊 Welcome, {user['name']}")
+    st.markdown(f"## 📊 Academic Workspace Overview")
+    st.markdown(f"Welcome back, **{user['name']}**. Track your real-time analytics indicators below.")
     st.markdown("---")
     
     col1, col2, col3 = st.columns(3)
@@ -137,17 +198,19 @@ def render_dashboard():
             st.metric("Custom Indexed Library", f"{len(pdfs)} PDFs")
 
     st.write("### Available Architectural Capabilities")
-    st.info("💡 **Pro-Tip**: Use the left sidebar selection terminal to toggle between specialized view modes. Our Supervisor agent dynamically monitors chat requests to distribute computational workloads.")
+    st.info("💡 **Pro-Tip**: Use the left sidebar navigation matrix to toggle between cognitive work subnodes. Our Supervisor agent dynamically balances operational requests.")
 
 def render_chat():
-    st.title("💬 Cognitive Workspace")
+    st.markdown("## 💬 Cognitive Chat Workspace")
     user = st.session_state.user
     
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([3, 1])
     with col1:
-        teacher_mode = st.selectbox("Pedagogical Target Mode", ["Beginner", "Advanced", "Interview"])
+        teacher_mode = st.selectbox("Pedagogical Target Mode Override", ["Beginner", "Advanced", "Interview"])
     with col2:
-        clear_hist = st.button("Purge Chat Window Cache")
+        st.write(" ")
+        st.write(" ")
+        clear_hist = st.button("Purge Workspace Cache", use_container_width=True)
         
     with get_db_session() as session:
         if clear_hist:
@@ -162,12 +225,12 @@ def render_chat():
             with st.chat_message(role):
                 st.markdown(msg.content)
 
-    if prompt := st.chat_input("Ask a conceptual question or interface document contents..."):
+    if prompt := st.chat_input("Ask a conceptual problem or run cross-document analysis vectors..."):
         with st.chat_message("user"):
             st.markdown(prompt)
             
         with st.chat_message("assistant"):
-            with st.spinner("Agentic loop processing workflow..."):
+            with st.spinner("Agentic workflow balancing execution tracks..."):
                 initial_graph_state = {
                     "user_input": prompt,
                     "user_id": user["id"],
@@ -187,7 +250,7 @@ def render_chat():
                 
                 citations = final_state.get("citations", [])
                 if citations:
-                    with st.expander("📄 Source Documents Citations"):
+                    with st.expander("📄 Source Document Context Citations"):
                         for cite in citations:
                             st.markdown(f"**[{cite['citation_index']}] File:** {cite['source']} (Page {cite['page']})")
                             st.caption(f"Snippet: *{cite['snippet']}*")
@@ -196,13 +259,13 @@ def render_chat():
                     HistoryManager.save_chat_turn(session, user["id"], prompt, output_content)
 
 def render_upload():
-    st.title("📁 Upload Material Library")
+    st.markdown("## 📁 Knowledge Vector Material Library")
     user = st.session_state.user
     
-    uploaded_file = st.file_uploader("Index personal reference materials (PDF only)", type=["pdf"])
+    uploaded_file = st.file_uploader("Index personal reference materials (PDF format strictly supported)", type=["pdf"])
     if uploaded_file is not None:
-        if st.button("Execute Indexing Pipeline"):
-            with st.spinner("Extracting layout matrix nodes and saving to vector stores..."):
+        if st.button("Execute Ingestion Pipeline", use_container_width=True):
+            with st.spinner("Extracting layout matrices and compiling FAISS storage indices..."):
                 file_bytes = uploaded_file.read()
                 with get_db_session() as session:
                     record = st.session_state.pdf_service.process_and_index_user_pdf(
@@ -224,17 +287,17 @@ def render_upload():
             st.caption("No custom study documents uploaded yet.")
 
 def render_quiz():
-    st.title("🎯 Quiz Assessment Engine")
+    st.markdown("## 🎯 Adaptive Assessment Engine")
     user = st.session_state.user
     
     col1, col2 = st.columns(2)
     with col1:
         topic = st.text_input("Target Evaluation Topic Context", "Operating Systems Process Synchronization")
     with col2:
-        q_type = st.selectbox("Format Type", ["MCQ", "FILL", "CODING"])
+        q_type = st.selectbox("Format Architecture Style", ["MCQ", "FILL", "CODING"])
         
-    if st.button("Generate Dynamic Assessment"):
-        with st.spinner("Compiling structural challenge questions..."):
+    if st.button("Generate Assessment Deck", use_container_width=True):
+        with st.spinner("Compiling structural verification items..."):
             initial_state = {
                 "user_input": topic,
                 "user_id": user["id"],
@@ -268,15 +331,15 @@ def render_quiz():
                 if ans == item.get("correct_answer"):
                     score_counter += 1
             else:
-                ans = st.text_input("Input your answer sequence", key=f"q_{idx}")
+                ans = st.text_input("Input exact structural response token", key=f"q_{idx}")
                 if ans.strip().lower() == str(item.get("correct_answer")).strip().lower():
                     score_counter += 1
-            with st.expander("See Explanation Details"):
+            with st.expander("Review Academic Breakdown Summary"):
                 st.write(f"*Correct Answer:* **{item.get('correct_answer')}**")
                 st.write(item.get("explanation"))
             st.write("---")
             
-        if st.button("Submit Score Transcript"):
+        if st.button("Submit Score Transcript", use_container_width=True):
             pct = (score_counter / total_q) * 100.0
             with get_db_session() as session:
                 rec = QuizResult(user_id=user["id"], topic=st.session_state.quiz_topic, score=pct)
@@ -285,15 +348,15 @@ def render_quiz():
                 progress = session.query(StudyProgress).filter(StudyProgress.user_id == user["id"]).first()
                 if progress:
                     progress.study_time += 0.25
-            st.success(f"Transcript captured perfectly! Score: {pct:.1f}%")
+            st.success(f"Transcript captured perfectly! Score profile tracked: {pct:.1f}%")
 
 def render_flashcards():
-    st.title("⚡ Active Recall Flashcards")
+    st.markdown("## ⚡ High-Yield Active Recall Decks")
     user = st.session_state.user
     
-    topic = st.text_input("Enter Focus Domain Topic Key", "Data Structures Trees and Graphs")
-    if st.button("Build Flashcard Deck"):
-        with st.spinner("Extracting active recall terms..."):
+    topic = st.text_input("Enter Focus Domain Topic Area", "Data Structures Trees and Graphs")
+    if st.button("Build Dynamic Recall Deck", use_container_width=True):
+        with st.spinner("Extracting functional context dimensions..."):
             initial_state = {
                 "user_input": topic,
                 "user_id": user["id"],
@@ -310,29 +373,29 @@ def render_flashcards():
 
     if "active_deck" in st.session_state and st.session_state.active_deck:
         if isinstance(st.session_state.active_deck, dict):
-            st.error("Error constructing structured deck. Please retry query syntax.")
+            st.error("Error constructing structured deck. Please retry query layout.")
             return
             
         for card in st.session_state.active_deck:
             with st.container():
                 st.markdown(f"#### ❔ Question: {card.get('front')}")
-                with st.expander("🔄 Flip Card to View Core Answer"):
-                    st.success(f"**Answer:** {card.get('back')}")
+                with st.expander("🔄 Flip Active Card Structure"):
+                    st.info(f"**Answer Core:** {card.get('back')}")
                 st.markdown("---")
 
 def render_planner():
-    st.title("📅 Personalized Study Schedule Planner")
+    st.markdown("## 📅 Dynamic Curriculum & Milestone Planner")
     user = st.session_state.user
     
     col1, col2 = st.columns(2)
     with col1:
-        topic = st.text_input("Target Objective/Exam Scope", "DBMS Midterm Review")
-        weeks = st.slider("Duration (Weeks)", 1, 12, 4)
+        topic = st.text_input("Target Objective/Exam Horizon Scope", "DBMS Midterm Review")
+        weeks = st.slider("Timeline Horizon Allocation (Weeks)", 1, 12, 4)
     with col2:
-        hours = st.slider("Daily Allocation Threshold Commitment (Hours)", 1, 8, 2)
+        hours = st.slider("Daily Study Time Threshold Commitment (Hours)", 1, 8, 2)
         
-    if st.button("Generate Complete Schedule Map"):
-        with st.spinner("Assembling curriculum architecture tracks..."):
+    if st.button("Generate Complete Schedule Map", use_container_width=True):
+        with st.spinner("Assembling personalized milestone charts..."):
             state = {
                 "user_input": topic,
                 "user_id": user["id"],
@@ -348,14 +411,14 @@ def render_planner():
             st.markdown(res.get("agent_output", {}).get("content", ""))
 
 def render_progress():
-    st.title("📈 Progress Analytics Matrix")
+    st.markdown("## 📈 Performance Analytics Matrix")
     user = st.session_state.user
     
     with get_db_session() as session:
         progress = session.query(StudyProgress).filter(StudyProgress.user_id == user["id"]).first()
         quizzes = session.query(QuizResult).filter(QuizResult.user_id == user["id"]).order_by(QuizResult.date.desc()).all()
         
-        st.write("### Core System Performance Metrics")
+        st.write("### Core System Diagnostics Summary")
         col1, col2 = st.columns(2)
         with col1:
             st.metric("Total Cumulative Calculated Study Time", f"{progress.study_time if progress else 0.0} Hours")
@@ -363,38 +426,39 @@ def render_progress():
             st.metric("Total Assessments Concluded", f"{len(quizzes)} Quizzes")
             
         st.write("---")
-        st.write("### Evaluation History Matrix")
+        st.write("### Historical Evaluation Records Log")
         if quizzes:
             for q in quizzes:
-                st.write(f"🎯 **Topic:** {q.topic} | **Score Profile:** `{q.score:.1f}%` | *Date:* {q.date.strftime('%Y-%m-%d')}")
+                st.write(f"🎯 **Topic Target:** {q.topic} | **Score:** `{q.score:.1f}%` | *Date Logged:* {q.date.strftime('%Y-%m-%d')}")
         else:
-            st.caption("No systemic evaluation records logged for this session account.")
+            st.caption("No historical diagnostic score items logged for this workspace account.")
 
 def render_settings():
-    st.title("⚙️ Workspace Profile Settings")
+    st.markdown("## ⚙️ Profile Workspace Settings")
     user = st.session_state.user
-    st.write("### Session Profile Context Data")
-    st.write(f"- **Student Profile Name Target:** {user['name']}")
-    st.write(f"- **Secure Identity Communication Email Address:** {user['email']}")
+    st.write("### Active Session Context")
+    st.write(f"- **Student Profile Identity Name:** {user['name']}")
+    st.write(f"- **Linked Communication Email Endpoint:** {user['email']}")
     st.markdown("---")
-    st.caption("agentic_ai_clean Architecture Core System Engine — Built with Streamlit & LangGraph State Engines.")
+    st.caption("StudyPilot AI Engine running on LangGraph Orchestration Topology Layers.")
 
-# Core Sidebar Selection Layout Controllers Routing Context Matrix
+# Core Sidebar Context Router Terminal Setup
 if st.session_state.user is None:
     render_login_signup()
 else:
     with st.sidebar:
-        st.markdown(f"### ✈️ StudyPilot AI\n**User:** {st.session_state.user['name']}")
+        st.markdown(f"### ✈️ StudyPilot AI\n**Active Student:** {st.session_state.user['name']}")
         st.markdown("---")
         choice = st.radio(
-            "Navigation Menu Desk",
+            "Navigation Workspace Desk",
             ["Dashboard", "Chat Workspace", "Upload Library", "Quiz Center", "Flashcards Deck", "Curriculum Planner", "Progress Matrix", "Settings Desk"]
         )
         st.markdown("---")
-        if st.button("Terminate Active Session"):
+        if st.button("Terminate Session Profile", use_container_width=True):
             st.session_state.user = None
             st.rerun()
 
+    # Route selected layout controller bounds viewport screens cleanly
     if choice == "Dashboard":
         render_dashboard()
     elif choice == "Chat Workspace":

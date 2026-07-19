@@ -1,0 +1,43 @@
+[2026-07-19 19:04:41.848] [INFO] [agentic_ai_clean] [connection.py:14]: Initializing database engine with target URL: sqlite:///agentic_study_assistant.db
+[2026-07-19 19:04:42.056] [INFO] [agentic_ai_clean] [connection.py:32]: SQLAlchemy database engine and SessionLocal factory initialized successfully.
+[2026-07-19 19:08:07.210] [INFO] [agentic_ai_clean] [connection.py:14]: Initializing database engine with target URL: sqlite:///agentic_study_assistant.db
+[2026-07-19 19:08:07.294] [INFO] [agentic_ai_clean] [connection.py:32]: SQLAlchemy database engine and SessionLocal factory initialized successfully.
+[2026-07-19 19:09:45.907] [INFO] [agentic_ai_clean] [connection.py:43]: Executing database table initialization...
+[2026-07-19 19:09:46.088] [INFO] [agentic_ai_clean] [connection.py:45]: All database tables synced and created successfully.
+[2026-07-19 19:09:46.089] [INFO] [agentic_ai_clean] [text_processor.py:25]: TextProcessor initialized with chunk_size=1000, chunk_overlap=200
+[2026-07-19 19:09:46.089] [INFO] [agentic_ai_clean] [vector_store.py:26]: Initializing OpenAIEmbeddings with model=text-embedding-3-small
+[2026-07-19 19:09:50.916] [INFO] [agentic_ai_clean] [pdf_service.py:73]: Scanning built-in library directories targets for core assets updates: knowledge_base
+[2026-07-19 19:09:50.919] [INFO] [agentic_ai_clean] [pdf_service.py:80]: No base systemic textbooks detected inside the global knowledge folder layout path.
+[2026-07-19 19:09:50.919] [INFO] [agentic_ai_clean] [graph_orchestrator.py:25]: Initializing multi-agent structural graph component objects...
+[2026-07-19 19:09:50.920] [INFO] [agentic_ai_clean] [supervisor.py:24]: Initializing SupervisorAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:09:52.816] [INFO] [agentic_ai_clean] [teacher.py:23]: Initializing TeacherAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:09:54.907] [INFO] [agentic_ai_clean] [vector_store.py:26]: Initializing OpenAIEmbeddings with model=text-embedding-3-small
+[2026-07-19 19:09:56.991] [INFO] [agentic_ai_clean] [pdf_worker.py:25]: Initializing PDFWorkerAgent with model=openai/gpt-4o
+[2026-07-19 19:09:56.993] [INFO] [agentic_ai_clean] [quiz_master.py:24]: Initializing QuizMasterAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:09:56.996] [INFO] [agentic_ai_clean] [notes_generator.py:22]: Initializing NotesGeneratorAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:09:56.997] [INFO] [agentic_ai_clean] [flashcard_worker.py:24]: Initializing FlashcardWorkerAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:09:56.998] [INFO] [agentic_ai_clean] [planner.py:22]: Initializing StudyPlannerAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:09:57.000] [INFO] [agentic_ai_clean] [progress_tracker.py:22]: Initializing ProgressTrackerAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:09:57.007] [INFO] [agentic_ai_clean] [graph_orchestrator.py:94]: LangGraph workflow state structure successfully wired and compiled.
+[2026-07-19 19:09:57.083] [INFO] [agentic_ai_clean] [streamlit_app.py:80]: Application infrastructure states fully hydrated.
+[2026-07-19 19:10:31.743] [WARNING] [agentic_ai_clean] [manager.py:88]: Authentication failure: No profile found for email 'aishwaryasobhana@gmail.com'.
+[2026-07-19 19:10:55.610] [INFO] [agentic_ai_clean] [manager.py:71]: User account 'aishwaryasobhana@gmail.com' successfully created with structural metrics profiles.
+[2026-07-19 19:11:17.265] [INFO] [agentic_ai_clean] [manager.py:92]: User authentication verified successfully for identity target: 'aishwaryasobhana@gmail.com'.
+[2026-07-19 19:12:11.660] [INFO] [agentic_ai_clean] [connection.py:43]: Executing database table initialization...
+[2026-07-19 19:12:11.664] [INFO] [agentic_ai_clean] [connection.py:45]: All database tables synced and created successfully.
+[2026-07-19 19:12:11.665] [INFO] [agentic_ai_clean] [text_processor.py:25]: TextProcessor initialized with chunk_size=1000, chunk_overlap=200
+[2026-07-19 19:12:11.666] [INFO] [agentic_ai_clean] [vector_store.py:26]: Initializing OpenAIEmbeddings with model=text-embedding-3-small
+[2026-07-19 19:12:13.743] [INFO] [agentic_ai_clean] [pdf_service.py:73]: Scanning built-in library directories targets for core assets updates: knowledge_base
+[2026-07-19 19:12:13.744] [INFO] [agentic_ai_clean] [pdf_service.py:80]: No base systemic textbooks detected inside the global knowledge folder layout path.
+[2026-07-19 19:12:13.745] [INFO] [agentic_ai_clean] [graph_orchestrator.py:25]: Initializing multi-agent structural graph component objects...
+[2026-07-19 19:12:13.746] [INFO] [agentic_ai_clean] [supervisor.py:24]: Initializing SupervisorAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:12:13.747] [INFO] [agentic_ai_clean] [teacher.py:23]: Initializing TeacherAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:12:13.749] [INFO] [agentic_ai_clean] [vector_store.py:26]: Initializing OpenAIEmbeddings with model=text-embedding-3-small
+[2026-07-19 19:12:15.829] [INFO] [agentic_ai_clean] [pdf_worker.py:25]: Initializing PDFWorkerAgent with model=openai/gpt-4o
+[2026-07-19 19:12:15.831] [INFO] [agentic_ai_clean] [quiz_master.py:24]: Initializing QuizMasterAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:12:15.832] [INFO] [agentic_ai_clean] [notes_generator.py:22]: Initializing NotesGeneratorAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:12:15.833] [INFO] [agentic_ai_clean] [flashcard_worker.py:24]: Initializing FlashcardWorkerAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:12:15.835] [INFO] [agentic_ai_clean] [planner.py:22]: Initializing StudyPlannerAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:12:15.836] [INFO] [agentic_ai_clean] [progress_tracker.py:22]: Initializing ProgressTrackerAgent LLM with model=openai/gpt-4o
+[2026-07-19 19:12:15.842] [INFO] [agentic_ai_clean] [graph_orchestrator.py:94]: LangGraph workflow state structure successfully wired and compiled.
+[2026-07-19 19:12:15.910] [INFO] [agentic_ai_clean] [streamlit_app.py:80]: Application infrastructure states fully hydrated.
