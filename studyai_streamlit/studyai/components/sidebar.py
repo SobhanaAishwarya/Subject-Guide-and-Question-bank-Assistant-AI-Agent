@@ -10,7 +10,7 @@ import html
 import streamlit as st
 
 from config import AVAILABLE_MODELS, NAV_ITEMS, settings
-from utils.session import get_vector_store
+from utils.session import get_vector_store, sign_out
 
 
 def render_sidebar() -> str:
@@ -84,9 +84,7 @@ def render_sidebar() -> str:
             unsafe_allow_html=True,
         )
 
-        if st.button("🚪  Logout", key="nav_logout", use_container_width=True):
-            st.session_state.authenticated = False
-            st.session_state.page = "dashboard"
-            st.rerun()
+        if st.button("🚪  Sign Out", key="nav_logout", use_container_width=True):
+            sign_out()
 
     return st.session_state.page

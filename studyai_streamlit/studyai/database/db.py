@@ -21,6 +21,17 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 _SCHEMA = """
+CREATE TABLE IF NOT EXISTS users (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    name          TEXT NOT NULL,
+    email         TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    password_salt TEXT NOT NULL,
+    semester      TEXT NOT NULL DEFAULT 'Semester 5',
+    avatar        TEXT NOT NULL DEFAULT 'ST',
+    created_at    TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS documents (
     doc_id      TEXT PRIMARY KEY,
     name        TEXT NOT NULL,
@@ -101,6 +112,55 @@ class Database:
         with self.connect() as connection:
             connection.executescript(_SCHEMA)
         logger.info("Database ready at %s", self.path)
+
+    # ------------------------------------------------------------------ #
+    # Users
+    # ------------------------------------------------------------------ #
+    def create_user(
+        self,
+        name: str,
+        email: str,
+        password_hash: str,
+        password_salt: str,
+        semester: str = "Semester 5",
+    ) -> Dict[str, Any]:
+        avatar = "".join(part[0] for part in name.split()[:2]).upper() or "ST"
+        with self.connect() as connection:
+            cursor = connection.execute(
+                """INSERT INTO users
+                   (name, email, password_hash, password_salt, semester, avatar,
+                    created_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (name, email.lower(), password_hash, password_salt, semester,
+                 avatar, datetime.utcnow().isoformat()),
+            )
+            user_id = cursor.lastrowid
+        return self.get_user_by_id(user_id)
+
+    def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM users WHERE email = ?", (email.lower(),)
+            ).fetchone()
+        return dict(row) if row else None
+
+    def get_user_by_id(self, user_id: int) -> Optional[Dict[str, Any]]:
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM users WHERE id = ?", (user_id,)
+            ).fetchone()
+        return dict(row) if row else None
+
+    def update_user(self, user_id: int, **fields: Any) -> None:
+        """Update arbitrary columns, e.g. ``update_user(1, name=..., email=...)``."""
+        if not fields:
+            return
+        assignments = ", ".join(f"{column} = ?" for column in fields)
+        with self.connect() as connection:
+            connection.execute(
+                f"UPDATE users SET {assignments} WHERE id = ?",
+                (*fields.values(), user_id),
+            )
 
     # ------------------------------------------------------------------ #
     # Documents

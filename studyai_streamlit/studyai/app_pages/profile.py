@@ -51,14 +51,25 @@ def render() -> None:
         )
         if st.button("💾  Save profile", type="primary"):
             clean = name.strip() or "Student"
-            st.session_state.user = {
-                "name": clean,
-                "email": email.strip(),
-                "avatar": "".join(p[0] for p in clean.split()[:2]).upper() or "ST",
-                "semester": semester,
-            }
-            st.success("Profile updated.")
-            st.rerun()
+            clean_email = email.strip().lower()
+            existing = db.get_user_by_email(clean_email) if clean_email != user["email"] else None
+            if existing and existing["id"] != user["id"]:
+                st.error("Another account already uses that email.")
+            else:
+                avatar = "".join(p[0] for p in clean.split()[:2]).upper() or "ST"
+                db.update_user(
+                    user["id"], name=clean, email=clean_email, semester=semester,
+                    avatar=avatar,
+                )
+                st.session_state.user = {
+                    "id": user["id"],
+                    "name": clean,
+                    "email": clean_email,
+                    "avatar": avatar,
+                    "semester": semester,
+                }
+                st.success("Profile updated.")
+                st.rerun()
 
     # ---- AI settings ------------------------------------------------------ #
     with ai_tab:

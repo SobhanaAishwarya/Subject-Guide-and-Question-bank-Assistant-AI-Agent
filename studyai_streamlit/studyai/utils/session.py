@@ -28,8 +28,9 @@ _DEFAULTS: Dict[str, Any] = {
     "authenticated": False,
     "page": "dashboard",
     "user": {
+        "id": None,
         "name": "Student",
-        "email": "student@studyai.app",
+        "email": "",
         "avatar": "ST",
         "semester": "Semester 5",
     },
@@ -132,3 +133,18 @@ def reset_chat() -> None:
     """Start a fresh conversation."""
     st.session_state.messages = []
     st.session_state.session_id = uuid.uuid4().hex[:12]
+
+
+def log_in(user: Dict[str, Any]) -> None:
+    """Persist a signed-in user and drop the caller at the dashboard."""
+    st.session_state.user = user
+    st.session_state.authenticated = True
+    st.session_state.page = "dashboard"
+    st.rerun()
+
+
+def sign_out() -> None:
+    """Fully clear the session and return to the Sign In / Sign Up gate."""
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    st.rerun()

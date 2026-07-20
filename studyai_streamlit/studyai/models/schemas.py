@@ -17,6 +17,22 @@ def _new_id() -> str:
 
 
 @dataclass
+class User:
+    """An account holder. Never carries the password hash/salt — those stay
+    in the database layer and are only touched by ``services.auth``."""
+
+    name: str
+    email: str
+    semester: str = "Semester 5"
+    avatar: str = "ST"
+    id: Optional[int] = None
+    created_at: str = field(default_factory=_now)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
 class Chunk:
     """A single retrievable slice of a document."""
 
