@@ -25,7 +25,6 @@ import streamlit as st
 # --------------------------------------------------------------------------- #
 st.set_page_config(
     page_title="StudyAI — Agentic Study Assistant",
-    page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={"About": "StudyAI — RAG-powered study assistant built on Streamlit "
@@ -88,11 +87,10 @@ def main() -> None:
 
     if not settings.is_configured:
         st.warning(
-            "🔑 **No OpenRouter API key configured.** Uploading and indexing will "
+            "**No OpenRouter API key configured.** Uploading and indexing will "
             "still work, but no answers can be generated. Add "
             "`OPENROUTER_API_KEY` to your `.env` file, or to **Settings → "
-            "Secrets** in Streamlit Cloud.",
-            icon="⚠️",
+            "Secrets** in Streamlit Cloud."
         )
 
     render = ROUTES.get(active_page)

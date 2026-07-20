@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS flashcards (
 
 CREATE TABLE IF NOT EXISTS activity (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    icon       TEXT NOT NULL DEFAULT '✨',
+    icon       TEXT NOT NULL DEFAULT 'GN',
     text       TEXT NOT NULL,
     kind       TEXT NOT NULL DEFAULT 'general',
     minutes    INTEGER NOT NULL DEFAULT 0,
@@ -336,7 +336,7 @@ class Database:
     def log_activity(
         self,
         text: str,
-        icon: str = "✨",
+        icon: str = "GN",
         kind: str = "general",
         minutes: int = 0,
     ) -> None:

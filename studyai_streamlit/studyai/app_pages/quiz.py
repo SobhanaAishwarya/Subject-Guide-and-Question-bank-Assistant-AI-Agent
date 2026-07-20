@@ -39,7 +39,7 @@ def render() -> None:
         "Quiz Agent",
         "Adaptive multiple-choice questions generated from your own notes — "
         "every option traceable to a source.",
-        eyebrow="❓ QUIZ",
+        eyebrow="QUIZ",
     )
 
     if not require_documents(store):
@@ -59,11 +59,11 @@ def render() -> None:
             difficulty = st.selectbox("Difficulty", ["Easy", "Medium", "Hard"],
                                       index=1, key="quiz_difficulty")
 
-        if st.button("🎯  Generate Quiz", type="primary", use_container_width=True):
+        if st.button("Generate Quiz", type="primary", use_container_width=True):
             if not topic:
                 st.warning("Enter a topic first.")
                 return
-            with st.spinner("🤖 Writing questions from your documents…"):
+            with st.spinner("Writing questions from your documents…"):
                 try:
                     questions, sources = agents.generate_quiz(
                         topic, int(count), difficulty, active_sources()
@@ -74,7 +74,7 @@ def render() -> None:
 
             if not questions:
                 empty_state(
-                    "🤔",
+                    "QZ",
                     "Couldn't build a quiz on that topic",
                     "The uploaded documents don't seem to cover it. Try another topic.",
                 )
@@ -99,10 +99,10 @@ def render() -> None:
 
     header_left, header_right = st.columns([4, 1])
     with header_left:
-        st.markdown(f"### 📋 {quiz['topic']} · {quiz['difficulty']} · "
+        st.markdown(f"### {quiz['topic']} · {quiz['difficulty']} · "
                     f"{len(questions)} questions")
     with header_right:
-        if st.button("🔄  New quiz", use_container_width=True):
+        if st.button("New quiz", use_container_width=True):
             _reset_quiz()
             st.rerun()
 
@@ -133,22 +133,22 @@ def render() -> None:
             given = st.session_state.quiz_answers.get(index)
             correct = question["answer_index"]
             if given == correct:
-                st.success(f"✅ Correct — {question['options'][correct]}")
+                st.success(f"Correct — {question['options'][correct]}")
             else:
                 given_text = (question["options"][given]
                               if given is not None else "no answer")
-                st.error(f"❌ You chose: {given_text}  \n"
-                         f"✅ Correct: {question['options'][correct]}")
+                st.error(f"You chose: {given_text}  \n"
+                         f"Correct: {question['options'][correct]}")
             if question.get("explanation"):
-                st.info(f"💡 {question['explanation']}")
+                st.info(question["explanation"])
             if question.get("source"):
-                st.caption(f"📚 Source: {question['source']}")
+                st.caption(f"Source: {question['source']}")
 
         st.markdown("</div>", unsafe_allow_html=True)
 
     # ---- Submit / results ------------------------------------------------ #
     if not st.session_state.quiz_submitted:
-        if st.button("✅  Submit Answers", type="primary", use_container_width=True):
+        if st.button("Submit Answers", type="primary", use_container_width=True):
             if len(st.session_state.quiz_answers) < len(questions):
                 st.warning("Answer every question before submitting.")
             else:
@@ -166,7 +166,7 @@ def render() -> None:
                                     len(questions), wrong)
                 db.log_activity(
                     f"Quiz: {quiz['topic']} — {score}/{len(questions)}",
-                    icon="❓", kind="quiz", minutes=len(questions) * 2,
+                    icon="QZ", kind="quiz", minutes=len(questions) * 2,
                 )
                 st.rerun()
     else:
@@ -177,13 +177,18 @@ def render() -> None:
         percentage = int(round(score / len(questions) * 100))
         tone = tone_for_score(percentage)
 
+        result_label = (
+            "TOP SCORE" if percentage >= 80 else
+            "GOOD EFFORT" if percentage >= 50 else
+            "KEEP PRACTISING"
+        )
         st.markdown(
             f"""
             <div class="card" style="text-align:center;">
-              <div style="font-size:44px;">
-                {'🏆' if percentage >= 80 else '📈' if percentage >= 50 else '📚'}
+              <div class="pill{' green' if percentage >= 80 else ''}" style="font-size:12px;">
+                {result_label}
               </div>
-              <div style="font-size:33px;font-weight:800;">{score}/{len(questions)}</div>
+              <div style="font-size:33px;font-weight:800;margin-top:8px;">{score}/{len(questions)}</div>
               <div style="font-size:15px;color:var(--ink-soft);">{percentage}% correct</div>
               <div class="bar-track" style="margin-top:14px;">
                 <div class="bar-fill {tone}" style="width:{percentage}%"></div>
@@ -194,14 +199,14 @@ def render() -> None:
         )
 
         if percentage < 70:
-            st.info("💡 Below 70% — the Weak Topics agent can turn these misses "
+            st.info("Below 70% — the Weak Topics agent can turn these misses "
                     "into a focused revision plan.")
-            if st.button("⚠️  Analyse my weak topics"):
+            if st.button("Analyse my weak topics"):
                 st.session_state.page = "weak-topics"
                 st.rerun()
 
         st.caption("Sources used to build this quiz:")
-        with st.expander(f"📚 Sources ({len(quiz['sources'])})"):
+        with st.expander(f"Sources ({len(quiz['sources'])})"):
             for position, item in enumerate(quiz["sources"], start=1):
                 chunk = item["chunk"]
                 citation = chunk["source"] + (

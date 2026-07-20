@@ -130,19 +130,19 @@ SUBJECTS: Final[List[str]] = [
 # Navigation (1:1 port of src/components/layout/Sidebar.tsx)
 # --------------------------------------------------------------------------- #
 NAV_ITEMS: Final[List[dict]] = [
-    {"id": "dashboard", "icon": "🏠", "label": "Dashboard"},
-    {"id": "upload", "icon": "📁", "label": "Upload Center"},
-    {"id": "chat", "icon": "💬", "label": "Chat with Docs"},
-    {"id": "notes", "icon": "📝", "label": "Notes Agent"},
-    {"id": "quiz", "icon": "❓", "label": "Quiz Agent"},
-    {"id": "flashcards", "icon": "🃏", "label": "Flashcard Agent"},
-    {"id": "planner", "icon": "📅", "label": "Planner Agent"},
-    {"id": "revision", "icon": "🔄", "label": "Revision Agent"},
-    {"id": "weak-topics", "icon": "⚠️", "label": "Weak Topics"},
-    {"id": "interview", "icon": "🎤", "label": "Interview Mode"},
-    {"id": "cross-subject", "icon": "🔗", "label": "Cross Subject"},
-    {"id": "analytics", "icon": "📊", "label": "Analytics"},
-    {"id": "profile", "icon": "👤", "label": "Profile"},
+    {"id": "dashboard", "label": "Dashboard"},
+    {"id": "upload", "label": "Upload Center"},
+    {"id": "chat", "label": "Chat with Docs"},
+    {"id": "notes", "label": "Notes Agent"},
+    {"id": "quiz", "label": "Quiz Agent"},
+    {"id": "flashcards", "label": "Flashcard Agent"},
+    {"id": "planner", "label": "Planner Agent"},
+    {"id": "revision", "label": "Revision Agent"},
+    {"id": "weak-topics", "label": "Weak Topics"},
+    {"id": "interview", "label": "Interview Mode"},
+    {"id": "cross-subject", "label": "Cross Subject"},
+    {"id": "analytics", "label": "Analytics"},
+    {"id": "profile", "label": "Profile"},
 ]
 
 # The exact refusal string required by the project specification.

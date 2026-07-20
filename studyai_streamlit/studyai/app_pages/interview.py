@@ -23,7 +23,7 @@ def render() -> None:
         "Interview Mode",
         "A mock technical interview built from your notes. Answer out loud, type "
         "it in, and get graded against the source.",
-        eyebrow="🎤 INTERVIEW",
+        eyebrow="INTERVIEW",
     )
 
     if not require_documents(store):
@@ -36,7 +36,7 @@ def render() -> None:
         source_selector(store)
         topic = st.text_input("Interview topic", key="int_topic",
                               placeholder="e.g. Operating Systems, DBMS, Networks")
-        if st.button("🎤  Start Interview", type="primary",
+        if st.button("Start Interview", type="primary",
                      use_container_width=True) and topic:
             state["topic"] = topic
             state["asked"] = []
@@ -47,25 +47,25 @@ def render() -> None:
     # ---- Header -------------------------------------------------------- #
     header_left, header_right = st.columns([4, 1])
     with header_left:
-        st.markdown(f"### 🎤 Interview: {state['topic']}  ·  "
+        st.markdown(f"### Interview: {state['topic']}  ·  "
                     f"Question {len(state['asked']) + 1}")
     with header_right:
-        if st.button("🔚  End", use_container_width=True):
+        if st.button("End", use_container_width=True):
             st.session_state.interview = {"topic": "", "asked": [], "turns": []}
             st.rerun()
 
     # ---- Transcript ----------------------------------------------------- #
     for turn in state["turns"]:
-        with st.chat_message("assistant", avatar="👔"):
+        with st.chat_message("assistant"):
             st.markdown(f"**{turn['question']}**")
-        with st.chat_message("user", avatar="🧑‍🎓"):
+        with st.chat_message("user"):
             st.markdown(turn["answer"])
-        with st.chat_message("assistant", avatar="📝"):
+        with st.chat_message("assistant"):
             st.markdown(turn["feedback"])
 
     # ---- Current question ------------------------------------------------ #
     if "current" not in state or not state.get("current"):
-        with st.spinner("🤖 Thinking of a question…"):
+        with st.spinner("Thinking of a question…"):
             try:
                 question, _ = agents.interview_question(
                     state["topic"], state["asked"], active_sources()
@@ -76,7 +76,7 @@ def render() -> None:
         state["current"] = question
         st.rerun()
 
-    with st.chat_message("assistant", avatar="👔"):
+    with st.chat_message("assistant"):
         st.markdown(f"**{state['current']}**")
 
     answer = st.text_area("Your answer", key=f"int_answer_{len(state['asked'])}",
@@ -84,9 +84,9 @@ def render() -> None:
 
     submit_column, skip_column = st.columns([3, 1])
     with submit_column:
-        if st.button("✅  Submit Answer", type="primary",
+        if st.button("Submit Answer", type="primary",
                      use_container_width=True) and answer.strip():
-            with st.spinner("🤖 Evaluating against your notes…"):
+            with st.spinner("Evaluating against your notes…"):
                 try:
                     feedback, sources = agents.evaluate_answer(
                         state["current"], answer, active_sources()
@@ -103,12 +103,12 @@ def render() -> None:
             state["asked"].append(state["current"])
             state["current"] = ""
             db.log_activity(f"Interview practice: {state['topic']}",
-                            icon="🎤", kind="interview", minutes=5)
+                            icon="IV", kind="interview", minutes=5)
             render_sources(sources)
             st.rerun()
 
     with skip_column:
-        if st.button("⏭️  Skip", use_container_width=True):
+        if st.button("Skip", use_container_width=True):
             state["asked"].append(state["current"])
             state["current"] = ""
             st.rerun()

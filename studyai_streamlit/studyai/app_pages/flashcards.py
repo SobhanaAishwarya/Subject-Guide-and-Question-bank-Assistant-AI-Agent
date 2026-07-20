@@ -25,13 +25,13 @@ def render() -> None:
         "Flashcard Agent",
         "Spaced-repetition cards written from your own material. Cards you miss "
         "come back sooner.",
-        eyebrow="🃏 FLASHCARDS",
+        eyebrow="FLASHCARDS",
     )
 
     if not require_documents(store):
         return
 
-    generate_tab, review_tab = st.tabs(["✨ Generate", "🎴 Review"])
+    generate_tab, review_tab = st.tabs(["Generate", "Review"])
 
     # ---- Generate ----------------------------------------------------- #
     with generate_tab:
@@ -43,9 +43,9 @@ def render() -> None:
         with right:
             count = st.number_input("Cards", 5, 30, 10, key="flash_count")
 
-        if st.button("✨  Generate Flashcards", type="primary",
+        if st.button("Generate Flashcards", type="primary",
                      use_container_width=True) and topic:
-            with st.spinner("🤖 Writing flashcards from your documents…"):
+            with st.spinner("Writing flashcards from your documents…"):
                 try:
                     cards, sources = agents.generate_flashcards(
                         topic, int(count), active_sources()
@@ -55,14 +55,14 @@ def render() -> None:
                     return
 
             if not cards:
-                empty_state("🤔", "No cards could be made",
+                empty_state("FC", "No cards could be made",
                             "Your documents may not cover that topic.")
                 return
 
             added = db.add_flashcards([c.__dict__ for c in cards])
             db.log_activity(f"Created {added} flashcards on {topic}",
-                            icon="🃏", kind="flashcards", minutes=3)
-            st.success(f"✅ Created {added} flashcards. Open the Review tab.")
+                            icon="FC", kind="flashcards", minutes=3)
+            st.success(f"Created {added} flashcards. Open the Review tab.")
             st.session_state.flash_index = 0
             st.session_state.flash_flipped = False
 
@@ -70,7 +70,7 @@ def render() -> None:
     with review_tab:
         all_cards = db.list_flashcards()
         if not all_cards:
-            empty_state("🃏", "No flashcards yet",
+            empty_state("FC", "No flashcards yet",
                         "Generate some in the first tab.")
             return
 
@@ -85,10 +85,10 @@ def render() -> None:
         mastered = sum(1 for c in deck if c["box"] >= 4)
         reviews = sum(c["reviews"] for c in deck)
         metric_row([
-            {"icon": "🃏", "value": len(deck), "label": "Cards in deck"},
-            {"icon": "✅", "value": mastered, "label": "Mastered (box 4+)"},
-            {"icon": "🔁", "value": reviews, "label": "Total reviews"},
-            {"icon": "📈", "value": f"{int(mastered / len(deck) * 100)}%",
+            {"icon": "FC", "value": len(deck), "label": "Cards in deck"},
+            {"icon": "OK", "value": mastered, "label": "Mastered (box 4+)"},
+            {"icon": "RV", "value": reviews, "label": "Total reviews"},
+            {"icon": "XR", "value": f"{int(mastered / len(deck) * 100)}%",
              "label": "Deck mastery"},
         ])
 
@@ -105,34 +105,34 @@ def render() -> None:
             unsafe_allow_html=True,
         )
         st.caption(
-            f"📦 Box {card['box']}/5 · {card['reviews']} reviews"
-            + (f" · 📚 {card['source']}" if card["source"] else "")
+            f"Box {card['box']}/5 · {card['reviews']} reviews"
+            + (f" · {card['source']}" if card["source"] else "")
         )
 
         st.write("")
         if not st.session_state.flash_flipped:
-            if st.button("🔄  Flip card", type="primary", use_container_width=True):
+            if st.button("Flip card", type="primary", use_container_width=True):
                 st.session_state.flash_flipped = True
                 st.rerun()
         else:
             miss_column, hit_column = st.columns(2)
             with miss_column:
-                if st.button("❌  Didn't know it", use_container_width=True):
+                if st.button("Didn't know it", use_container_width=True):
                     db.review_flashcard(card["id"], correct=False)
                     st.session_state.flash_index += 1
                     st.session_state.flash_flipped = False
                     st.rerun()
             with hit_column:
-                if st.button("✅  Got it", type="primary", use_container_width=True):
+                if st.button("Got it", type="primary", use_container_width=True):
                     db.review_flashcard(card["id"], correct=True)
-                    db.log_activity("Reviewed a flashcard", icon="🃏",
+                    db.log_activity("Reviewed a flashcard", icon="FC",
                                     kind="review", minutes=1)
                     st.session_state.flash_index += 1
                     st.session_state.flash_flipped = False
                     st.rerun()
 
         st.divider()
-        if st.button("🗑️  Delete this deck", key="flash_delete"):
+        if st.button("Delete this deck", key="flash_delete"):
             db.delete_flashcards(None if chosen == "All decks" else chosen)
             st.session_state.flash_index = 0
             st.rerun()

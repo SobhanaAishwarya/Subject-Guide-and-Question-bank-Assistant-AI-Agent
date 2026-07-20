@@ -19,7 +19,7 @@ _TRANSPARENT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
     margin=dict(l=10, r=10, t=34, b=10),
-    font=dict(color="#6B6A62"),
+    font=dict(color="#565959"),
 )
 
 
@@ -31,7 +31,7 @@ def render() -> None:
     hero(
         "Analytics",
         "Your study patterns, quiz accuracy and document coverage at a glance.",
-        eyebrow="📊 ANALYTICS",
+        eyebrow="ANALYTICS",
     )
 
     documents = db.list_documents()
@@ -45,10 +45,10 @@ def render() -> None:
         accuracy = int(round(scored / total * 100))
 
     metric_row([
-        {"icon": "❓", "value": len(attempts), "label": "Quizzes Taken"},
-        {"icon": "🎯", "value": f"{accuracy}%", "label": "Overall Accuracy"},
-        {"icon": "🃏", "value": len(cards), "label": "Flashcards"},
-        {"icon": "🧩", "value": store.size, "label": "Indexed Chunks"},
+        {"icon": "QZ", "value": len(attempts), "label": "Quizzes Taken"},
+        {"icon": "XR", "value": f"{accuracy}%", "label": "Overall Accuracy"},
+        {"icon": "FC", "value": len(cards), "label": "Flashcards"},
+        {"icon": "CH", "value": store.size, "label": "Indexed Chunks"},
     ])
 
     st.write("")
@@ -56,33 +56,33 @@ def render() -> None:
     # ---- Study minutes over time --------------------------------------- #
     activity = db.activity_by_day(days=14)
     if activity:
-        st.markdown('<div class="card"><h3>⏱️ Study minutes (last 14 days)</h3>',
+        st.markdown('<div class="card"><h3>Study minutes (last 14 days)</h3>',
                     unsafe_allow_html=True)
         frame = pd.DataFrame(activity)
         figure = go.Figure(
             go.Scatter(
                 x=frame["day"], y=frame["minutes"],
                 mode="lines+markers", fill="tozeroy",
-                line=dict(color="#F2A900", width=3),
-                fillcolor="rgba(242,169,0,0.18)",
-                marker=dict(size=8, color="#FFE08A",
-                            line=dict(color="#F2A900", width=2)),
+                line=dict(color="#2874F0", width=3),
+                fillcolor="rgba(40,116,240,0.15)",
+                marker=dict(size=8, color="#FFFFFF",
+                            line=dict(color="#2874F0", width=2)),
             )
         )
         figure.update_layout(height=280, **_TRANSPARENT)
         figure.update_xaxes(showgrid=False)
-        figure.update_yaxes(gridcolor="rgba(43,42,38,0.07)", title="minutes")
+        figure.update_yaxes(gridcolor="rgba(0,0,0,0.06)", title="minutes")
         st.plotly_chart(figure, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
     else:
-        empty_state("📈", "No activity recorded yet",
+        empty_state("AN", "No activity recorded yet",
                     "Use the agents and your study time will be tracked here.")
 
     left_column, right_column = st.columns(2)
 
     # ---- Quiz accuracy trend -------------------------------------------- #
     with left_column:
-        st.markdown('<div class="card"><h3>🎯 Quiz accuracy over time</h3>',
+        st.markdown('<div class="card"><h3>Quiz accuracy over time</h3>',
                     unsafe_allow_html=True)
         if attempts:
             frame = pd.DataFrame([
@@ -95,10 +95,11 @@ def render() -> None:
             ])
             figure = px.line(frame, x="Attempt", y="Score %", markers=True,
                              hover_data=["Topic"])
-            figure.update_traces(line=dict(color="#F2A900", width=3),
-                                 marker=dict(size=9, color="#FFE08A"))
+            figure.update_traces(line=dict(color="#FF9F00", width=3),
+                                 marker=dict(size=9, color="#FFFFFF",
+                                             line=dict(color="#FF9F00", width=2)))
             figure.update_layout(height=280, yaxis_range=[0, 100], **_TRANSPARENT)
-            figure.update_yaxes(gridcolor="rgba(43,42,38,0.07)")
+            figure.update_yaxes(gridcolor="rgba(0,0,0,0.06)")
             st.plotly_chart(figure, use_container_width=True)
         else:
             st.caption("Take a quiz to populate this chart.")
@@ -106,7 +107,7 @@ def render() -> None:
 
     # ---- Document coverage ---------------------------------------------- #
     with right_column:
-        st.markdown('<div class="card"><h3>📚 Coverage by subject</h3>',
+        st.markdown('<div class="card"><h3>Coverage by subject</h3>',
                     unsafe_allow_html=True)
         if documents:
             by_subject: dict[str, int] = {}
@@ -119,8 +120,8 @@ def render() -> None:
             )
             figure = px.pie(
                 frame, names="Subject", values="Chunks", hole=0.55,
-                color_discrete_sequence=["#F2A900", "#FFE08A", "#FFD166",
-                                         "#E9B949", "#C98600", "#FFF3C4"],
+                color_discrete_sequence=["#2874F0", "#FF9F00", "#388E3C",
+                                         "#FB641B", "#1A56C4", "#FFD814"],
             )
             figure.update_layout(height=280, **_TRANSPARENT)
             st.plotly_chart(figure, use_container_width=True)
@@ -130,7 +131,7 @@ def render() -> None:
 
     # ---- Flashcard mastery ------------------------------------------------ #
     if cards:
-        st.markdown('<div class="card"><h3>🃏 Flashcard mastery (Leitner boxes)</h3>',
+        st.markdown('<div class="card"><h3>Flashcard mastery (Leitner boxes)</h3>',
                     unsafe_allow_html=True)
         distribution = {box: 0 for box in range(1, 6)}
         for card in cards:
@@ -140,16 +141,16 @@ def render() -> None:
             "Cards": list(distribution.values()),
         })
         figure = px.bar(frame, x="Box", y="Cards",
-                        color_discrete_sequence=["#F2A900"])
+                        color_discrete_sequence=["#2874F0"])
         figure.update_layout(height=250, **_TRANSPARENT)
-        figure.update_yaxes(gridcolor="rgba(43,42,38,0.07)")
+        figure.update_yaxes(gridcolor="rgba(0,0,0,0.06)")
         st.plotly_chart(figure, use_container_width=True)
         st.caption("Box 1 = needs work · Box 5 = mastered")
         st.markdown("</div>", unsafe_allow_html=True)
 
     # ---- Attempts table ---------------------------------------------------- #
     if attempts:
-        st.markdown("##### 📋 Quiz history")
+        st.markdown("##### Quiz history")
         st.dataframe(
             pd.DataFrame([
                 {

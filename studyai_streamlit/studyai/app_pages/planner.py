@@ -25,7 +25,7 @@ def render() -> None:
         "Planner Agent",
         "A realistic study schedule built around your exam date and the topics "
         "in your own documents.",
-        eyebrow="📅 PLANNER",
+        eyebrow="PLANNER",
     )
 
     if not require_documents(store):
@@ -49,8 +49,8 @@ def render() -> None:
         key="plan_exam",
     )
 
-    if st.button("📅  Build My Study Plan", type="primary", use_container_width=True):
-        with st.spinner("🤖 Mapping your syllabus onto a calendar…"):
+    if st.button("Build My Study Plan", type="primary", use_container_width=True):
+        with st.spinner("Mapping your syllabus onto a calendar…"):
             try:
                 plan, sources = agents.generate_study_plan(
                     subject, int(days), float(hours),
@@ -66,9 +66,9 @@ def render() -> None:
 
         render_sources(sources)
         get_database().log_activity(f"Built a {days}-day plan for {subject}",
-                                    icon="📅", kind="planner", minutes=5)
+                                    icon="PL", kind="planner", minutes=5)
         st.download_button(
-            "⬇️  Download plan",
+            "Download plan",
             data=plan,
             file_name=f"study_plan_{subject.replace(' ', '_').lower()}.md",
             mime="text/markdown",

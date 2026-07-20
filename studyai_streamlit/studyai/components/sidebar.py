@@ -23,7 +23,7 @@ def render_sidebar() -> str:
         st.markdown(
             """
             <div class="sidebar-brand">
-              <div class="logo">🎓</div>
+              <div class="logo">S</div>
               <div>
                 <div class="name">StudyAI</div>
                 <div class="tag">Agentic Study Assistant</div>
@@ -37,7 +37,7 @@ def render_sidebar() -> str:
         for item in NAV_ITEMS:
             is_active = st.session_state.page == item["id"]
             if st.button(
-                f"{item['icon']}  {item['label']}",
+                item["label"],
                 key=f"nav_{item['id']}",
                 use_container_width=True,
                 type="primary" if is_active else "secondary",
@@ -51,7 +51,7 @@ def render_sidebar() -> str:
         current = st.session_state.get("model", settings.openrouter_model)
         options = list(dict.fromkeys([current] + AVAILABLE_MODELS))
         st.selectbox(
-            "🤖 Model (via OpenRouter)",
+            "Model (via OpenRouter)",
             options=options,
             index=options.index(current),
             key="model",
@@ -59,14 +59,14 @@ def render_sidebar() -> str:
 
         # ---- Index status ------------------------------------------- #
         if store.is_empty:
-            st.caption("📭 No documents indexed")
+            st.caption("No documents indexed")
         else:
             st.caption(
-                f"📚 {len(store.sources)} document(s) · {store.size} chunks indexed"
+                f"{len(store.sources)} document(s) · {store.size} chunks indexed"
             )
 
         if not settings.is_configured:
-            st.warning("⚠️ OPENROUTER_API_KEY not set", icon="🔑")
+            st.warning("OPENROUTER_API_KEY not set")
 
         st.divider()
 
@@ -84,7 +84,7 @@ def render_sidebar() -> str:
             unsafe_allow_html=True,
         )
 
-        if st.button("🚪  Sign Out", key="nav_logout", use_container_width=True):
+        if st.button("Sign Out", key="nav_logout", use_container_width=True):
             sign_out()
 
     return st.session_state.page

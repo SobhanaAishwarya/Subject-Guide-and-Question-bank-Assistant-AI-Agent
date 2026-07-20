@@ -36,12 +36,12 @@ def _ask(question: str) -> None:
     db = get_database()
 
     add_message(Message(role="user", content=question))
-    with st.chat_message("user", avatar="🧑‍🎓"):
+    with st.chat_message("user"):
         st.markdown(question)
 
-    with st.chat_message("assistant", avatar="🎓"):
+    with st.chat_message("assistant"):
         placeholder = st.empty()
-        placeholder.markdown('<span class="typing">🔍 Searching your documents…</span>',
+        placeholder.markdown('<span class="typing">Searching your documents…</span>',
                              unsafe_allow_html=True)
 
         try:
@@ -72,7 +72,7 @@ def _ask(question: str) -> None:
             related=related,
         )
     )
-    db.log_activity(f"Asked: {question[:60]}", icon="💬", kind="chat", minutes=2)
+    db.log_activity(f"Asked: {question[:60]}", icon="CH", kind="chat", minutes=2)
     st.rerun()
 
 
@@ -95,14 +95,13 @@ def render() -> None:
         source_selector(store)
     with controls_right:
         st.write("")
-        if st.button("🧹  New chat", use_container_width=True):
+        if st.button("New chat", use_container_width=True):
             reset_chat()
             st.rerun()
 
     # ---- Replay conversation history --------------------------------- #
     for message in st.session_state.messages:
-        avatar = "🧑‍🎓" if message.role == "user" else "🎓"
-        with st.chat_message(message.role, avatar=avatar):
+        with st.chat_message(message.role):
             st.markdown(message.content)
             if message.role == "assistant":
                 render_source_dicts(message.sources)
@@ -111,7 +110,7 @@ def render() -> None:
     if st.session_state.messages:
         last = st.session_state.messages[-1]
         if last.role == "assistant" and last.related:
-            st.caption("💡 Related questions")
+            st.caption("Related questions")
             for position, suggestion in enumerate(last.related):
                 if st.button(suggestion, key=f"rel_{len(st.session_state.messages)}_{position}"):
                     _ask(suggestion)

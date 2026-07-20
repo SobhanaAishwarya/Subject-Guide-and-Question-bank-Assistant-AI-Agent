@@ -24,23 +24,23 @@ from utils.session import get_database, get_vector_store
 
 # The eight agent tiles from the original dashboard grid.
 AGENT_TILES = [
-    {"id": "notes", "icon": "📝", "label": "Notes Agent", "desc": "Generate smart notes"},
-    {"id": "quiz", "icon": "❓", "label": "Quiz Agent", "desc": "MCQ & adaptive quizzes"},
-    {"id": "flashcards", "icon": "🃏", "label": "Flashcard Agent", "desc": "Spaced repetition"},
-    {"id": "planner", "icon": "📅", "label": "Planner Agent", "desc": "AI study schedule"},
-    {"id": "revision", "icon": "🔄", "label": "Revision Agent", "desc": "Rapid revision sheets"},
-    {"id": "weak-topics", "icon": "⚠️", "label": "Weak Topics", "desc": "Track weak areas"},
-    {"id": "interview", "icon": "🎤", "label": "Interview Mode", "desc": "AI mock interviews"},
-    {"id": "cross-subject", "icon": "🔗", "label": "Cross Subject", "desc": "Multi-doc reasoning"},
+    {"id": "notes", "icon": "NT", "label": "Notes Agent", "desc": "Generate smart notes"},
+    {"id": "quiz", "icon": "QZ", "label": "Quiz Agent", "desc": "MCQ & adaptive quizzes"},
+    {"id": "flashcards", "icon": "FC", "label": "Flashcard Agent", "desc": "Spaced repetition"},
+    {"id": "planner", "icon": "PL", "label": "Planner Agent", "desc": "AI study schedule"},
+    {"id": "revision", "icon": "RV", "label": "Revision Agent", "desc": "Rapid revision sheets"},
+    {"id": "weak-topics", "icon": "WT", "label": "Weak Topics", "desc": "Track weak areas"},
+    {"id": "interview", "icon": "IV", "label": "Interview Mode", "desc": "AI mock interviews"},
+    {"id": "cross-subject", "icon": "CS", "label": "Cross Subject", "desc": "Multi-doc reasoning"},
 ]
 
 ACHIEVEMENTS = [
-    {"icon": "🏆", "label": "7 Day Streak", "test": lambda s: s["streak"] >= 7},
-    {"icon": "🎯", "label": "Quiz Master", "test": lambda s: s["quizzes"] >= 5},
-    {"icon": "📚", "label": "Revision Hero", "test": lambda s: s["minutes"] >= 60},
-    {"icon": "🃏", "label": "50 Flashcards", "test": lambda s: s["cards"] >= 50},
-    {"icon": "📁", "label": "First Upload", "test": lambda s: s["docs"] >= 1},
-    {"icon": "✅", "label": "3 Subjects", "test": lambda s: s["subjects"] >= 3},
+    {"icon": "07", "label": "7 Day Streak", "test": lambda s: s["streak"] >= 7},
+    {"icon": "QM", "label": "Quiz Master", "test": lambda s: s["quizzes"] >= 5},
+    {"icon": "RH", "label": "Revision Hero", "test": lambda s: s["minutes"] >= 60},
+    {"icon": "50", "label": "50 Flashcards", "test": lambda s: s["cards"] >= 50},
+    {"icon": "UP", "label": "First Upload", "test": lambda s: s["docs"] >= 1},
+    {"icon": "03", "label": "3 Subjects", "test": lambda s: s["subjects"] >= 3},
 ]
 
 
@@ -73,7 +73,7 @@ def render() -> None:
 
     first_name = user["name"].split()[0]
     hero(
-        f"Good to see you, {first_name}! 👋",
+        f"Good to see you, {first_name}!",
         "Everything below is generated from the documents you upload — "
         "no invented facts, always with citations.",
         eyebrow="AI STUDY COACH",
@@ -82,10 +82,10 @@ def render() -> None:
     # ---- Quick actions --------------------------------------------- #
     action_columns = st.columns(4)
     quick_actions = [
-        ("💬 Chat with Docs", "chat"),
-        ("🃏 Flashcards", "flashcards"),
-        ("❓ Quiz", "quiz"),
-        ("📝 Notes", "notes"),
+        ("Chat with Docs", "chat"),
+        ("Flashcards", "flashcards"),
+        ("Quiz", "quiz"),
+        ("Notes", "notes"),
     ]
     for column, (label, target) in zip(action_columns, quick_actions):
         with column:
@@ -98,13 +98,13 @@ def render() -> None:
     # ---- Metrics ---------------------------------------------------- #
     metric_row(
         [
-            {"icon": "🔥", "value": streak, "label": "Day Streak",
-             "note": "Keep it up! 🎉" if streak else "Start today"},
-            {"icon": "🎯", "value": f"{readiness}%", "label": "Exam Readiness",
+            {"icon": "ST", "value": streak, "label": "Day Streak",
+             "note": "Keep it up!" if streak else "Start today"},
+            {"icon": "XR", "value": f"{readiness}%", "label": "Exam Readiness",
              "note": "Based on your quizzes"},
-            {"icon": "⏱️", "value": minutes, "label": "Min Today",
+            {"icon": "MT", "value": minutes, "label": "Min Today",
              "note": "Study time logged"},
-            {"icon": "📚", "value": len(subject_counts) or 0, "label": "Subjects",
+            {"icon": "SB", "value": len(subject_counts) or 0, "label": "Subjects",
              "note": user["semester"]},
         ]
     )
@@ -114,7 +114,7 @@ def render() -> None:
 
     # ---- Subject progress ------------------------------------------- #
     with left:
-        st.markdown('<div class="card"><h3>📈 Subject Coverage</h3>',
+        st.markdown('<div class="card"><h3>Subject Coverage</h3>',
                     unsafe_allow_html=True)
         if not documents:
             st.caption("Upload documents to see per-subject coverage here.")
@@ -132,13 +132,13 @@ def render() -> None:
                 progress_row(subject, share, tone="good" if share >= 30 else "")
         st.markdown("</div>", unsafe_allow_html=True)
 
-        if st.button("📁  Upload more documents", key="dash_upload"):
+        if st.button("Upload more documents", key="dash_upload"):
             st.session_state.page = "upload"
             st.rerun()
 
     # ---- Recent quiz scores ----------------------------------------- #
     with right:
-        st.markdown('<div class="card"><h3>❓ Recent Quiz Scores</h3>',
+        st.markdown('<div class="card"><h3>Recent Quiz Scores</h3>',
                     unsafe_allow_html=True)
         if not attempts:
             st.caption("No quizzes taken yet.")
@@ -152,12 +152,12 @@ def render() -> None:
                 )
         st.markdown("</div>", unsafe_allow_html=True)
 
-        if st.button("⚠️  Analyse weak topics", key="dash_weak"):
+        if st.button("Analyse weak topics", key="dash_weak"):
             st.session_state.page = "weak-topics"
             st.rerun()
 
     # ---- Agent grid -------------------------------------------------- #
-    st.markdown("### 🤖 AI Agents")
+    st.markdown("### AI Agents")
     for row_start in range(0, len(AGENT_TILES), 4):
         row = AGENT_TILES[row_start : row_start + 4]
         columns = st.columns(4)
@@ -182,7 +182,7 @@ def render() -> None:
 
     # ---- Recent activity --------------------------------------------- #
     with bottom_left:
-        st.markdown('<div class="card"><h3>🕒 Recent Activity</h3>',
+        st.markdown('<div class="card"><h3>Recent Activity</h3>',
                     unsafe_allow_html=True)
         activity = db.recent_activity(limit=6)
         if not activity:
@@ -200,7 +200,7 @@ def render() -> None:
 
     # ---- Achievements ------------------------------------------------ #
     with bottom_right:
-        st.markdown('<div class="card"><h3>🏆 Achievements</h3>',
+        st.markdown('<div class="card"><h3>Achievements</h3>',
                     unsafe_allow_html=True)
         stats = {
             "streak": streak,
@@ -219,8 +219,10 @@ def render() -> None:
                     <div style="text-align:center;padding:11px 6px;border-radius:14px;
                                 border:1px solid var(--line);margin-bottom:8px;
                                 opacity:{'1' if earned else '0.4'};
-                                background:{'var(--butter-soft)' if earned else 'transparent'};">
-                      <div style="font-size:21px;">{achievement['icon']}</div>
+                                background:{'var(--primary-soft)' if earned else 'transparent'};">
+                      <div style="font-size:15px;font-weight:800;color:var(--primary);">
+                        {achievement['icon']}
+                      </div>
                       <div style="font-size:10.5px;line-height:1.25;">
                         {html.escape(achievement['label'])}
                       </div>
@@ -233,7 +235,7 @@ def render() -> None:
     if store.is_empty:
         st.write("")
         empty_state(
-            "🚀",
+            "GO",
             "Nothing indexed yet",
             "Upload your first PDF to unlock every agent on this dashboard.",
         )

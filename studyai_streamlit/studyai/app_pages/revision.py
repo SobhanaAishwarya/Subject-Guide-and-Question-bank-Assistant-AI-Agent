@@ -21,7 +21,7 @@ def render() -> None:
         "Revision Agent",
         "Last-mile revision sheets: definitions, formulas, mnemonics and the "
         "mistakes people usually make.",
-        eyebrow="🔄 REVISION",
+        eyebrow="REVISION",
     )
 
     if not require_documents(store):
@@ -44,9 +44,9 @@ def render() -> None:
     topic = st.text_input("Topic to revise", key="rev_topic",
                           placeholder="e.g. Deadlock, Indexing, OSI Model")
 
-    if st.button("⚡  Generate Revision Sheet", type="primary",
+    if st.button("Generate Revision Sheet", type="primary",
                  use_container_width=True) and topic:
-        with st.spinner("🤖 Condensing your material…"):
+        with st.spinner("Condensing your material…"):
             try:
                 sheet, sources = agents.generate_revision(topic, active_sources())
             except Exception as exc:  # noqa: BLE001
@@ -58,10 +58,10 @@ def render() -> None:
         st.markdown("</div>", unsafe_allow_html=True)
 
         render_sources(sources)
-        get_database().log_activity(f"Revised {topic}", icon="🔄",
+        get_database().log_activity(f"Revised {topic}", icon="RV",
                                     kind="revision", minutes=10)
         st.download_button(
-            "⬇️  Download sheet",
+            "Download sheet",
             data=sheet,
             file_name=f"revision_{topic.replace(' ', '_').lower()}.md",
             mime="text/markdown",

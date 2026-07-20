@@ -23,19 +23,19 @@ def render() -> None:
     hero(
         f"{user['name']}",
         f"{user['email']} · {user['semester']}",
-        eyebrow="👤 PROFILE",
+        eyebrow="PROFILE",
     )
 
     metric_row([
-        {"icon": "🔥", "value": db.streak(), "label": "Day Streak"},
-        {"icon": "📄", "value": len(db.list_documents()), "label": "Documents"},
-        {"icon": "❓", "value": len(db.list_quiz_attempts()), "label": "Quizzes"},
-        {"icon": "🃏", "value": len(db.list_flashcards()), "label": "Flashcards"},
+        {"icon": "ST", "value": db.streak(), "label": "Day Streak"},
+        {"icon": "DC", "value": len(db.list_documents()), "label": "Documents"},
+        {"icon": "QZ", "value": len(db.list_quiz_attempts()), "label": "Quizzes"},
+        {"icon": "FC", "value": len(db.list_flashcards()), "label": "Flashcards"},
     ])
 
     st.write("")
     profile_tab, ai_tab, data_tab, history_tab = st.tabs(
-        ["👤 Profile", "🤖 AI Settings", "💾 Data", "💬 History"]
+        ["Profile", "AI Settings", "Data", "History"]
     )
 
     # ---- Profile --------------------------------------------------------- #
@@ -49,7 +49,7 @@ def render() -> None:
             index=semesters.index(user["semester"]) if user["semester"] in semesters else 4,
             key="prof_sem",
         )
-        if st.button("💾  Save profile", type="primary"):
+        if st.button("Save profile", type="primary"):
             clean = name.strip() or "Student"
             clean_email = email.strip().lower()
             existing = db.get_user_by_email(clean_email) if clean_email != user["email"] else None
@@ -73,7 +73,7 @@ def render() -> None:
 
     # ---- AI settings ------------------------------------------------------ #
     with ai_tab:
-        st.markdown("##### 🔌 OpenRouter connection")
+        st.markdown("##### OpenRouter connection")
         if settings.is_configured:
             st.success("API key detected.")
         else:
@@ -82,13 +82,13 @@ def render() -> None:
                 "or to **Settings → Secrets** on Streamlit Cloud."
             )
 
-        if st.button("🩺  Test connection"):
+        if st.button("Test connection"):
             with st.spinner("Pinging OpenRouter…"):
                 ok, message = get_llm().health_check()
             (st.success if ok else st.error)(message)
 
         st.divider()
-        st.markdown("##### 🤖 Model")
+        st.markdown("##### Model")
         current = st.session_state.get("model", settings.openrouter_model)
         options = list(dict.fromkeys([current] + AVAILABLE_MODELS))
         # NOTE: a different key from the sidebar picker — the sidebar renders on
@@ -101,7 +101,7 @@ def render() -> None:
         st.caption("Every model above is served through https://openrouter.ai/api/v1")
 
         st.divider()
-        st.markdown("##### 🔍 Retrieval")
+        st.markdown("##### Retrieval")
         st.slider(
             "Chunks retrieved per question (top-k)", 3, 15,
             st.session_state.get("top_k", settings.top_k), key="top_k",
@@ -121,26 +121,26 @@ def render() -> None:
 
     # ---- Data -------------------------------------------------------------- #
     with data_tab:
-        st.markdown("##### 📊 Storage")
+        st.markdown("##### Storage")
         st.write(f"- **{store.size}** indexed chunks across "
                  f"**{len(store.sources)}** document(s)")
         st.write(f"- Vector store: `{store.store_dir}`")
         st.write(f"- Database: `{db.path}`")
 
         st.divider()
-        st.markdown("##### ⚠️ Danger zone")
+        st.markdown("##### Danger zone")
         danger_left, danger_middle, danger_right = st.columns(3)
         with danger_left:
-            if st.button("🗑️  Clear chat history", use_container_width=True):
+            if st.button("Clear chat history", use_container_width=True):
                 db.clear_session(st.session_state.session_id)
                 reset_chat()
                 st.success("Chat history cleared.")
         with danger_middle:
-            if st.button("🗑️  Clear flashcards", use_container_width=True):
+            if st.button("Clear flashcards", use_container_width=True):
                 db.delete_flashcards()
                 st.success("Flashcards cleared.")
         with danger_right:
-            if st.button("🗑️  Clear vector index", use_container_width=True):
+            if st.button("Clear vector index", use_container_width=True):
                 for document in db.list_documents():
                     db.delete_document(document["doc_id"])
                 store.clear()
@@ -157,13 +157,13 @@ def render() -> None:
                 messages = db.get_messages(session["session_id"])
                 first = next((m["content"] for m in messages if m["role"] == "user"), "…")
                 label = (
-                    f"💬 {first[:64]} · {session['turns']} turns · "
+                    f"{first[:64]} · {session['turns']} turns · "
                     f"{session['started'][:10]}"
                 )
                 with st.expander(label):
                     for message in messages:
-                        who = "🧑‍🎓 You" if message["role"] == "user" else "🎓 StudyAI"
+                        who = "You" if message["role"] == "user" else "StudyAI"
                         st.markdown(f"**{who}:** {message['content'][:900]}")
-                    if st.button("🗑️ Delete", key=f"del_sess_{session['session_id']}"):
+                    if st.button("Delete", key=f"del_sess_{session['session_id']}"):
                         db.clear_session(session["session_id"])
                         st.rerun()

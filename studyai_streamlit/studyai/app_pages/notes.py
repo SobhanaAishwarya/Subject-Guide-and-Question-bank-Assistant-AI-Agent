@@ -15,7 +15,7 @@ from utils.session import active_sources, get_agents, get_database, get_vector_s
 
 def _run(label: str, generator, icon: str, minutes: int = 5) -> None:
     """Execute an agent call, render the result and log the activity."""
-    with st.spinner(f"🤖 {label}…"):
+    with st.spinner(f"{label}…"):
         try:
             text, sources = generator()
         except Exception as exc:  # noqa: BLE001
@@ -30,7 +30,7 @@ def _run(label: str, generator, icon: str, minutes: int = 5) -> None:
     get_database().log_activity(label, icon=icon, kind="notes", minutes=minutes)
 
     st.download_button(
-        "⬇️  Download as Markdown",
+        "Download as Markdown",
         data=text,
         file_name=f"{label.replace(' ', '_').lower()}.md",
         mime="text/markdown",
@@ -46,7 +46,7 @@ def render() -> None:
         "Notes Agent",
         "Turn your uploaded material into structured notes, summaries, "
         "explanations and question banks — all cited.",
-        eyebrow="📝 NOTES",
+        eyebrow="NOTES",
     )
 
     if not require_documents(store):
@@ -56,7 +56,7 @@ def render() -> None:
     sources = active_sources()
 
     notes_tab, summary_tab, explain_tab, bank_tab, paper_tab = st.tabs(
-        ["📝 Notes", "📄 Summary", "🎓 Explain", "❓ Question Bank", "📊 Previous Papers"]
+        ["Notes", "Summary", "Explain", "Question Bank", "Previous Papers"]
     )
 
     # ---- Notes -------------------------------------------------------- #
@@ -67,11 +67,11 @@ def render() -> None:
             "Style", ["Detailed", "Concise", "Exam-focused", "Bullet points"],
             key="notes_style"
         )
-        if st.button("✨  Generate Notes", type="primary", key="btn_notes") and topic:
+        if st.button("Generate Notes", type="primary", key="btn_notes") and topic:
             _run(
                 f"Notes on {topic}",
                 lambda: agents.generate_notes(topic, style, sources),
-                icon="📝",
+                icon="NT",
             )
 
     # ---- Summary ------------------------------------------------------ #
@@ -80,11 +80,11 @@ def render() -> None:
                                 placeholder="e.g. Chapter 4, or the whole document")
         length = st.radio("Length", ["Short", "Medium", "Long"], index=1,
                           horizontal=True, key="sum_length")
-        if st.button("✨  Summarise", type="primary", key="btn_sum") and subject:
+        if st.button("Summarise", type="primary", key="btn_sum") and subject:
             _run(
                 f"Summary of {subject}",
                 lambda: agents.summarise(subject, length, sources),
-                icon="📄",
+                icon="SM",
             )
 
     # ---- Explain ------------------------------------------------------ #
@@ -96,11 +96,11 @@ def render() -> None:
             index=1,
             key="exp_level",
         )
-        if st.button("✨  Explain", type="primary", key="btn_exp") and topic:
+        if st.button("Explain", type="primary", key="btn_exp") and topic:
             _run(
                 f"Explanation of {topic}",
                 lambda: agents.explain_topic(topic, level, sources),
-                icon="🎓",
+                icon="EX",
             )
 
     # ---- Question bank ------------------------------------------------ #
@@ -110,13 +110,13 @@ def render() -> None:
             "Mode", ["Full question bank", "Important questions only"],
             horizontal=True, key="bank_mode"
         )
-        if st.button("✨  Generate", type="primary", key="btn_bank") and topic:
+        if st.button("Generate", type="primary", key="btn_bank") and topic:
             if mode == "Full question bank":
                 _run(f"Question bank for {topic}",
-                     lambda: agents.question_bank(topic, sources), icon="❓")
+                     lambda: agents.question_bank(topic, sources), icon="QB")
             else:
                 _run(f"Important questions for {topic}",
-                     lambda: agents.important_questions(topic, sources), icon="⭐")
+                     lambda: agents.important_questions(topic, sources), icon="IQ")
 
     # ---- Previous papers ---------------------------------------------- #
     with paper_tab:
@@ -128,9 +128,9 @@ def render() -> None:
             height=150,
             help="Leave empty to analyse whatever papers you uploaded.",
         )
-        if st.button("✨  Analyse Papers", type="primary", key="btn_paper") and subject:
+        if st.button("Analyse Papers", type="primary", key="btn_paper") and subject:
             _run(
                 f"Previous paper analysis for {subject}",
                 lambda: agents.analyse_previous_paper(subject, pasted, sources),
-                icon="📊",
+                icon="PP",
             )

@@ -62,7 +62,7 @@ def metric_row(cards: Sequence[dict]) -> None:
     for column, card in zip(columns, cards):
         with column:
             metric_card(
-                card.get("icon", "✨"),
+                card.get("icon", "•"),
                 card.get("value", "—"),
                 card.get("label", ""),
                 card.get("note", ""),
@@ -133,7 +133,7 @@ def render_sources(sources: Sequence[RetrievedChunk], expanded: bool = False) ->
     if not sources:
         return
 
-    with st.expander(f"📚 Sources ({len(sources)})", expanded=expanded):
+    with st.expander(f"Sources ({len(sources)})", expanded=expanded):
         for position, item in enumerate(sources, start=1):
             chunk = item.chunk
             st.markdown(
@@ -155,7 +155,7 @@ def render_source_dicts(sources: Iterable[dict]) -> None:
     items = list(sources)
     if not items:
         return
-    with st.expander(f"📚 Sources ({len(items)})"):
+    with st.expander(f"Sources ({len(items)})"):
         for position, item in enumerate(items, start=1):
             chunk = item.get("chunk", item)
             citation = chunk.get("source", "document")
@@ -184,11 +184,11 @@ def require_documents(store) -> bool:
     if not store.is_empty:
         return True
     empty_state(
-        "📁",
+        "UP",
         "No documents indexed yet",
         "Head to the Upload Center and add a PDF, DOCX, PPTX or TXT file first.",
     )
-    if st.button("📁 Go to Upload Center", type="primary"):
+    if st.button("Go to Upload Center", type="primary"):
         st.session_state.page = "upload"
         st.rerun()
     return False

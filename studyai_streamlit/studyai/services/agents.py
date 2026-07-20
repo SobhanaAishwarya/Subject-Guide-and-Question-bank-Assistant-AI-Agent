@@ -230,9 +230,9 @@ class AgentService:
 
         instruction = (
             f'Create a rapid revision sheet for "{topic}".\n\n'
-            "## ⚡ 5-Minute Recap\n## 🔑 Must-Know Definitions\n"
-            "## 📐 Formulas & Algorithms\n## 🧠 Memory Hooks (mnemonics)\n"
-            "## ⚠️ Common Mistakes\n## ✅ Self-Check Questions\n\n"
+            "## 5-Minute Recap\n## Must-Know Definitions\n"
+            "## Formulas & Algorithms\n## Memory Hooks (mnemonics)\n"
+            "## Common Mistakes\n## Self-Check Questions\n\n"
             "Keep it dense and scannable."
         )
         return self._generate(instruction, context, max_tokens=2000), results
@@ -336,8 +336,8 @@ class AgentService:
 
         instruction = (
             f'Analyse "{query}" across the documents.\n\n'
-            "## 🔗 Connections Across Documents\n## 🆚 Contrasts & Differences\n"
-            "## 🧩 Unified Explanation\n## 🎯 Exam Angle\n\n"
+            "## Connections Across Documents\n## Contrasts & Differences\n"
+            "## Unified Explanation\n## Exam Angle\n\n"
             "Name the specific document behind each point and cite as [n]."
         )
         return self._generate(instruction, context, max_tokens=2500), results
@@ -433,8 +433,8 @@ class AgentService:
         extra = f"\n\nPASTED PAPER:\n{paper_text[:6000]}" if paper_text else ""
         instruction = (
             f'Analyse previous papers for "{subject}".{extra}\n\n'
-            "## 📊 Repeated Topics\n## 📈 Mark Distribution\n"
-            "## 🔮 Likely Questions This Time\n## 🎯 Preparation Priority\n\n"
+            "## Repeated Topics\n## Mark Distribution\n"
+            "## Likely Questions This Time\n## Preparation Priority\n\n"
             "Base every claim on the material and cite as [n]."
         )
         return self._generate(instruction, context, max_tokens=2500), results

@@ -18,7 +18,7 @@ def render() -> None:
     st.markdown(
         """
         <div class="login-shell">
-          <div class="logo">🎓</div>
+          <div class="logo">S</div>
           <h1>Welcome to StudyAI</h1>
           <p>Your agentic study assistant. Upload your notes, ask anything,
              and get answers grounded in your own documents.</p>
@@ -30,7 +30,7 @@ def render() -> None:
     db = get_database()
     _, middle, _ = st.columns([1, 2, 1])
     with middle:
-        signin_tab, signup_tab = st.tabs(["🔐  Sign In", "🆕  Sign Up"])
+        signin_tab, signup_tab = st.tabs(["Sign In", "Sign Up"])
 
         # ---- Sign In ----------------------------------------------------- #
         with signin_tab:
@@ -43,7 +43,7 @@ def render() -> None:
                     placeholder="Your password",
                 )
                 submitted = st.form_submit_button(
-                    "🚀  Sign In", type="primary", use_container_width=True
+                    "Sign In", type="primary", use_container_width=True
                 )
             if submitted:
                 user, error = auth.sign_in(db, email, password)
@@ -76,7 +76,7 @@ def render() -> None:
                     placeholder="Re-enter your password",
                 )
                 submitted = st.form_submit_button(
-                    "🎓  Create account", type="primary", use_container_width=True
+                    "Create account", type="primary", use_container_width=True
                 )
             if submitted:
                 user, error = auth.sign_up(db, name, email, password, confirm, semester)
@@ -87,7 +87,7 @@ def render() -> None:
                     log_in(user)
 
         st.caption(
-            "🔒 Passwords are stored as salted PBKDF2 hashes, never in plain "
+            "Passwords are stored as salted PBKDF2 hashes, never in plain "
             "text. Your documents never leave this Streamlit instance except "
             "as retrieved context sent to OpenRouter."
         )

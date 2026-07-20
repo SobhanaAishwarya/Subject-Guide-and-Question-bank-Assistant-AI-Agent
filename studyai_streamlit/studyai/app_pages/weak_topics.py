@@ -34,7 +34,7 @@ def render() -> None:
         "Weak Topics",
         "Where you're losing marks, and exactly what to do about it — inferred "
         "from your quiz history and your own notes.",
-        eyebrow="⚠️ DIAGNOSTICS",
+        eyebrow="DIAGNOSTICS",
     )
 
     if not require_documents(store):
@@ -43,7 +43,7 @@ def render() -> None:
     # ---- Measured weakness from quiz history -------------------------- #
     attempts = db.list_quiz_attempts()
     if attempts:
-        st.markdown('<div class="card"><h3>📊 Measured from your quizzes</h3>',
+        st.markdown('<div class="card"><h3>Measured from your quizzes</h3>',
                     unsafe_allow_html=True)
         by_topic: dict[str, list[int]] = {}
         for attempt in attempts:
@@ -62,7 +62,7 @@ def render() -> None:
             frame = pd.DataFrame(rows, columns=["Topic", "Average %"])
             figure = px.bar(
                 frame, x="Average %", y="Topic", orientation="h",
-                color="Average %", color_continuous_scale=["#E24C4C", "#F2A900", "#38A34A"],
+                color="Average %", color_continuous_scale=["#CC0C39", "#FF9F00", "#388E3C"],
                 range_color=[0, 100],
             )
             figure.update_layout(
@@ -72,20 +72,20 @@ def render() -> None:
             )
             st.plotly_chart(figure, use_container_width=True)
     else:
-        empty_state("📊", "No quiz history yet",
+        empty_state("AN", "No quiz history yet",
                     "Take a quiz and your measured weak spots will appear here.")
 
     st.divider()
 
     # ---- AI analysis -------------------------------------------------- #
-    st.markdown("### 🤖 AI analysis of your material")
+    st.markdown("### AI analysis of your material")
     source_selector(store)
     subject = st.selectbox("Subject", SUBJECTS + ["Other"], key="weak_subject")
     if subject == "Other":
         subject = st.text_input("Custom subject", key="weak_custom") or "General"
 
-    if st.button("🔍  Analyse Weak Topics", type="primary", use_container_width=True):
-        with st.spinner("🤖 Cross-referencing your misses against your notes…"):
+    if st.button("Analyse Weak Topics", type="primary", use_container_width=True):
+        with st.spinner("Cross-referencing your misses against your notes…"):
             try:
                 topics, sources = agents.analyse_weak_topics(
                     subject, db.wrong_answers(), active_sources()
@@ -95,7 +95,7 @@ def render() -> None:
                 return
 
         if not topics:
-            empty_state("🤔", "Nothing conclusive",
+            empty_state("WT", "Nothing conclusive",
                         "Not enough material on that subject to analyse.")
             return
 
@@ -106,9 +106,9 @@ def render() -> None:
             if topic.get("reason"):
                 st.markdown(f"**Why it's hard:** {topic['reason']}")
             if topic.get("action"):
-                st.info(f"🎯 **Next step:** {topic['action']}")
+                st.info(f"**Next step:** {topic['action']}")
             st.markdown("</div>", unsafe_allow_html=True)
 
         render_sources(sources)
-        db.log_activity(f"Analysed weak topics in {subject}", icon="⚠️",
+        db.log_activity(f"Analysed weak topics in {subject}", icon="WT",
                         kind="analysis", minutes=4)
