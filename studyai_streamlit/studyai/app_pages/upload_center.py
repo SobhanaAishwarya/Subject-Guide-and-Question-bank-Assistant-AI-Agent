@@ -117,11 +117,11 @@ def render() -> None:
     documents = db.list_documents()
     metric_row(
         [
-            {"icon": "DC", "value": len(documents), "label": "Documents"},
-            {"icon": "CH", "value": store.size, "label": "Indexed Chunks"},
-            {"icon": "SB", "value": len({d["subject"] for d in documents}),
+            {"value": len(documents), "label": "Documents"},
+            {"value": store.size, "label": "Indexed Chunks"},
+            {"value": len({d["subject"] for d in documents}),
              "label": "Subjects"},
-            {"icon": "SZ", "value": human_size(sum(d["size_bytes"] for d in documents)),
+            {"value": human_size(sum(d["size_bytes"] for d in documents)),
              "label": "Total Size"},
         ]
     )
@@ -155,7 +155,6 @@ def render() -> None:
                 st.rerun()
         else:
             empty_state(
-                "UP",
                 "Drop your study material here",
                 "PDF · DOCX · PPTX · TXT — multiple files at once are fine.",
             )
@@ -163,7 +162,7 @@ def render() -> None:
     # ---- Library ------------------------------------------------------ #
     with library_tab:
         if not documents:
-            empty_state("LB", "Library is empty", "Upload something to get started.")
+            empty_state("Library is empty", "Upload something to get started.")
             return
 
         table = pd.DataFrame(

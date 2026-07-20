@@ -11,6 +11,7 @@ _MULTI_NEWLINE_RE = re.compile(r"\n{3,}")
 _PAGE_NUMBER_RE = re.compile(r"^\s*(page\s*)?\d{1,4}\s*$", re.IGNORECASE)
 _HYPHEN_BREAK_RE = re.compile(r"(\w)-\n(\w)")
 _CONTROL_RE = re.compile(r"[\x00-\x08\x0e-\x1f\x7f]")
+_BR_TAG_RE = re.compile(r"\s*<br\s*/?>\s*", re.IGNORECASE)
 
 
 def clean_text(raw: str) -> str:
@@ -53,6 +54,17 @@ def human_size(num_bytes: int) -> str:
             return f"{size:.1f} {unit}" if unit != "B" else f"{int(size)} B"
         size /= 1024
     return f"{size:.1f} GB"
+
+
+def strip_html_breaks(text: str) -> str:
+    """
+    Replace literal ``<br>`` tags with a plain separator.
+
+    Streamlit's markdown renderer escapes raw HTML by default, so a model
+    that packs multi-line table cells with ``<br>`` (a common habit) ends up
+    showing the literal tag text instead of a line break.
+    """
+    return _BR_TAG_RE.sub("; ", text)
 
 
 def strip_code_fences(text: str) -> str:

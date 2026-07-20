@@ -211,7 +211,9 @@ class AgentService:
             + ".\n\nCover ONLY topics that actually appear in the material. "
             "For each day give: the topics, a time breakdown, the revision "
             "activity, and a checkpoint. Add a final revision day. "
-            "Use a Markdown table per day."
+            "Use a Markdown table per day. Keep every table cell on a single "
+            "line of plain text (use commas or semicolons to separate items) "
+            "— never use HTML tags such as <br>."
         )
         return self._generate(instruction, context, max_tokens=2800), results
 

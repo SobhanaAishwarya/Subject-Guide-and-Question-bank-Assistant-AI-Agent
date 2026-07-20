@@ -24,23 +24,23 @@ from utils.session import get_database, get_vector_store
 
 # The eight agent tiles from the original dashboard grid.
 AGENT_TILES = [
-    {"id": "notes", "icon": "NT", "label": "Notes Agent", "desc": "Generate smart notes"},
-    {"id": "quiz", "icon": "QZ", "label": "Quiz Agent", "desc": "MCQ & adaptive quizzes"},
-    {"id": "flashcards", "icon": "FC", "label": "Flashcard Agent", "desc": "Spaced repetition"},
-    {"id": "planner", "icon": "PL", "label": "Planner Agent", "desc": "AI study schedule"},
-    {"id": "revision", "icon": "RV", "label": "Revision Agent", "desc": "Rapid revision sheets"},
-    {"id": "weak-topics", "icon": "WT", "label": "Weak Topics", "desc": "Track weak areas"},
-    {"id": "interview", "icon": "IV", "label": "Interview Mode", "desc": "AI mock interviews"},
-    {"id": "cross-subject", "icon": "CS", "label": "Cross Subject", "desc": "Multi-doc reasoning"},
+    {"id": "notes", "label": "Notes Agent", "desc": "Generate smart notes"},
+    {"id": "quiz", "label": "Quiz Agent", "desc": "MCQ & adaptive quizzes"},
+    {"id": "flashcards", "label": "Flashcard Agent", "desc": "Spaced repetition"},
+    {"id": "planner", "label": "Planner Agent", "desc": "AI study schedule"},
+    {"id": "revision", "label": "Revision Agent", "desc": "Rapid revision sheets"},
+    {"id": "weak-topics", "label": "Weak Topics", "desc": "Track weak areas"},
+    {"id": "interview", "label": "Interview Mode", "desc": "AI mock interviews"},
+    {"id": "cross-subject", "label": "Cross Subject", "desc": "Multi-doc reasoning"},
 ]
 
 ACHIEVEMENTS = [
-    {"icon": "07", "label": "7 Day Streak", "test": lambda s: s["streak"] >= 7},
-    {"icon": "QM", "label": "Quiz Master", "test": lambda s: s["quizzes"] >= 5},
-    {"icon": "RH", "label": "Revision Hero", "test": lambda s: s["minutes"] >= 60},
-    {"icon": "50", "label": "50 Flashcards", "test": lambda s: s["cards"] >= 50},
-    {"icon": "UP", "label": "First Upload", "test": lambda s: s["docs"] >= 1},
-    {"icon": "03", "label": "3 Subjects", "test": lambda s: s["subjects"] >= 3},
+    {"label": "7 Day Streak", "test": lambda s: s["streak"] >= 7},
+    {"label": "Quiz Master", "test": lambda s: s["quizzes"] >= 5},
+    {"label": "Revision Hero", "test": lambda s: s["minutes"] >= 60},
+    {"label": "50 Flashcards", "test": lambda s: s["cards"] >= 50},
+    {"label": "First Upload", "test": lambda s: s["docs"] >= 1},
+    {"label": "3 Subjects", "test": lambda s: s["subjects"] >= 3},
 ]
 
 
@@ -98,13 +98,13 @@ def render() -> None:
     # ---- Metrics ---------------------------------------------------- #
     metric_row(
         [
-            {"icon": "ST", "value": streak, "label": "Day Streak",
+            {"value": streak, "label": "Day Streak",
              "note": "Keep it up!" if streak else "Start today"},
-            {"icon": "XR", "value": f"{readiness}%", "label": "Exam Readiness",
+            {"value": f"{readiness}%", "label": "Exam Readiness",
              "note": "Based on your quizzes"},
-            {"icon": "MT", "value": minutes, "label": "Min Today",
+            {"value": minutes, "label": "Min Today",
              "note": "Study time logged"},
-            {"icon": "SB", "value": len(subject_counts) or 0, "label": "Subjects",
+            {"value": len(subject_counts) or 0, "label": "Subjects",
              "note": user["semester"]},
         ]
     )
@@ -166,7 +166,6 @@ def render() -> None:
                 st.markdown(
                     f"""
                     <div class="agent-tile">
-                      <div class="emoji">{tile['icon']}</div>
                       <div class="title">{html.escape(tile['label'])}</div>
                       <div class="desc">{html.escape(tile['desc'])}</div>
                     </div>
@@ -190,8 +189,9 @@ def render() -> None:
         else:
             for entry in activity:
                 st.markdown(
-                    f"<div style='display:flex;gap:10px;margin-bottom:9px;'>"
-                    f"<span style='font-size:17px;'>{entry['icon']}</span>"
+                    f"<div style='display:flex;align-items:center;gap:10px;margin-bottom:9px;'>"
+                    f"<span style='width:6px;height:6px;border-radius:50%;flex:0 0 6px;"
+                    f"background:var(--primary);'></span>"
                     f"<span style='font-size:13px;'>{html.escape(entry['text'])}</span>"
                     f"</div>",
                     unsafe_allow_html=True,
@@ -220,8 +220,8 @@ def render() -> None:
                                 border:1px solid var(--line);margin-bottom:8px;
                                 opacity:{'1' if earned else '0.4'};
                                 background:{'var(--primary-soft)' if earned else 'transparent'};">
-                      <div style="font-size:15px;font-weight:800;color:var(--primary);">
-                        {achievement['icon']}
+                      <div style="width:8px;height:8px;border-radius:50%;margin:0 auto 8px;
+                                  background:{'var(--primary)' if earned else 'var(--line)'};">
                       </div>
                       <div style="font-size:10.5px;line-height:1.25;">
                         {html.escape(achievement['label'])}
@@ -235,7 +235,6 @@ def render() -> None:
     if store.is_empty:
         st.write("")
         empty_state(
-            "GO",
             "Nothing indexed yet",
             "Upload your first PDF to unlock every agent on this dashboard.",
         )

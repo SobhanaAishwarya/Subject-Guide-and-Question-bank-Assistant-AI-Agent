@@ -45,10 +45,10 @@ def render() -> None:
         accuracy = int(round(scored / total * 100))
 
     metric_row([
-        {"icon": "QZ", "value": len(attempts), "label": "Quizzes Taken"},
-        {"icon": "XR", "value": f"{accuracy}%", "label": "Overall Accuracy"},
-        {"icon": "FC", "value": len(cards), "label": "Flashcards"},
-        {"icon": "CH", "value": store.size, "label": "Indexed Chunks"},
+        {"value": len(attempts), "label": "Quizzes Taken"},
+        {"value": f"{accuracy}%", "label": "Overall Accuracy"},
+        {"value": len(cards), "label": "Flashcards"},
+        {"value": store.size, "label": "Indexed Chunks"},
     ])
 
     st.write("")
@@ -75,7 +75,7 @@ def render() -> None:
         st.plotly_chart(figure, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
     else:
-        empty_state("AN", "No activity recorded yet",
+        empty_state("No activity recorded yet",
                     "Use the agents and your study time will be tracked here.")
 
     left_column, right_column = st.columns(2)

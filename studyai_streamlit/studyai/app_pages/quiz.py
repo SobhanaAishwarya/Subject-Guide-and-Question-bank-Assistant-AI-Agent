@@ -74,7 +74,6 @@ def render() -> None:
 
             if not questions:
                 empty_state(
-                    "QZ",
                     "Couldn't build a quiz on that topic",
                     "The uploaded documents don't seem to cover it. Try another topic.",
                 )

@@ -41,12 +41,11 @@ def hero(title: str, subtitle: str, eyebrow: str = "STUDYAI") -> None:
     )
 
 
-def metric_card(icon: str, value: str, label: str, note: str = "") -> None:
-    """Render a single glassmorphic metric card."""
+def metric_card(value: str, label: str, note: str = "") -> None:
+    """Render a single stat card: bold value, label, optional note."""
     st.markdown(
         f"""
         <div class="metric">
-          <div class="icon">{icon}</div>
           <div class="value">{html.escape(str(value))}</div>
           <div class="label">{html.escape(label)}</div>
           {f'<div class="note">{html.escape(note)}</div>' if note else ''}
@@ -62,7 +61,6 @@ def metric_row(cards: Sequence[dict]) -> None:
     for column, card in zip(columns, cards):
         with column:
             metric_card(
-                card.get("icon", "•"),
                 card.get("value", "—"),
                 card.get("label", ""),
                 card.get("note", ""),
@@ -106,12 +104,11 @@ def card_close() -> None:
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-def empty_state(emoji: str, title: str, subtitle: str) -> None:
+def empty_state(title: str, subtitle: str) -> None:
     """Render a friendly placeholder when there is nothing to show."""
     st.markdown(
         f"""
         <div class="empty-state">
-          <div class="emoji">{emoji}</div>
           <div class="title">{html.escape(title)}</div>
           <div class="sub">{html.escape(subtitle)}</div>
         </div>
@@ -184,7 +181,6 @@ def require_documents(store) -> bool:
     if not store.is_empty:
         return True
     empty_state(
-        "UP",
         "No documents indexed yet",
         "Head to the Upload Center and add a PDF, DOCX, PPTX or TXT file first.",
     )

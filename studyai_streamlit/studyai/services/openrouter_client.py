@@ -16,7 +16,7 @@ import requests
 
 from config import settings
 from utils.logger import get_logger
-from utils.text_utils import strip_code_fences
+from utils.text_utils import strip_code_fences, strip_html_breaks
 
 logger = get_logger(__name__)
 
@@ -112,7 +112,8 @@ class OpenRouterClient:
                 choices = data.get("choices") or []
                 if not choices:
                     raise OpenRouterError(f"Empty response from OpenRouter: {data}")
-                return (choices[0].get("message") or {}).get("content", "").strip()
+                content = (choices[0].get("message") or {}).get("content", "").strip()
+                return strip_html_breaks(content)
 
             except OpenRouterError:
                 raise

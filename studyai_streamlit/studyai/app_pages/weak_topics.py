@@ -72,7 +72,7 @@ def render() -> None:
             )
             st.plotly_chart(figure, use_container_width=True)
     else:
-        empty_state("AN", "No quiz history yet",
+        empty_state("No quiz history yet",
                     "Take a quiz and your measured weak spots will appear here.")
 
     st.divider()
@@ -95,7 +95,7 @@ def render() -> None:
                 return
 
         if not topics:
-            empty_state("WT", "Nothing conclusive",
+            empty_state("Nothing conclusive",
                         "Not enough material on that subject to analyse.")
             return
 

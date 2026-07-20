@@ -27,10 +27,10 @@ def render() -> None:
     )
 
     metric_row([
-        {"icon": "ST", "value": db.streak(), "label": "Day Streak"},
-        {"icon": "DC", "value": len(db.list_documents()), "label": "Documents"},
-        {"icon": "QZ", "value": len(db.list_quiz_attempts()), "label": "Quizzes"},
-        {"icon": "FC", "value": len(db.list_flashcards()), "label": "Flashcards"},
+        {"value": db.streak(), "label": "Day Streak"},
+        {"value": len(db.list_documents()), "label": "Documents"},
+        {"value": len(db.list_quiz_attempts()), "label": "Quizzes"},
+        {"value": len(db.list_flashcards()), "label": "Flashcards"},
     ])
 
     st.write("")

@@ -78,7 +78,7 @@ def render() -> None:
                 return
 
         if not sources:
-            empty_state("CS", "Nothing relevant found",
+            empty_state("Nothing relevant found",
                         "Your documents don't seem to cover that.")
             return
 

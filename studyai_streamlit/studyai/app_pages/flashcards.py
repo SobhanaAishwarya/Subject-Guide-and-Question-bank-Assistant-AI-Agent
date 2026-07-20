@@ -55,7 +55,7 @@ def render() -> None:
                     return
 
             if not cards:
-                empty_state("FC", "No cards could be made",
+                empty_state("No cards could be made",
                             "Your documents may not cover that topic.")
                 return
 
@@ -70,7 +70,7 @@ def render() -> None:
     with review_tab:
         all_cards = db.list_flashcards()
         if not all_cards:
-            empty_state("FC", "No flashcards yet",
+            empty_state("No flashcards yet",
                         "Generate some in the first tab.")
             return
 
@@ -85,10 +85,10 @@ def render() -> None:
         mastered = sum(1 for c in deck if c["box"] >= 4)
         reviews = sum(c["reviews"] for c in deck)
         metric_row([
-            {"icon": "FC", "value": len(deck), "label": "Cards in deck"},
-            {"icon": "OK", "value": mastered, "label": "Mastered (box 4+)"},
-            {"icon": "RV", "value": reviews, "label": "Total reviews"},
-            {"icon": "XR", "value": f"{int(mastered / len(deck) * 100)}%",
+            {"value": len(deck), "label": "Cards in deck"},
+            {"value": mastered, "label": "Mastered (box 4+)"},
+            {"value": reviews, "label": "Total reviews"},
+            {"value": f"{int(mastered / len(deck) * 100)}%",
              "label": "Deck mastery"},
         ])
 

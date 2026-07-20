@@ -20,8 +20,6 @@ def render() -> None:
         <div class="login-shell">
           <div class="logo">S</div>
           <h1>Welcome to StudyAI</h1>
-          <p>Your agentic study assistant. Upload your notes, ask anything,
-             and get answers grounded in your own documents.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -85,9 +83,3 @@ def render() -> None:
                 else:
                     st.success("Account created — signing you in…")
                     log_in(user)
-
-        st.caption(
-            "Passwords are stored as salted PBKDF2 hashes, never in plain "
-            "text. Your documents never leave this Streamlit instance except "
-            "as retrieved context sent to OpenRouter."
-        )
