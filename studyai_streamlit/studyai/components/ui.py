@@ -41,6 +41,19 @@ def hero(title: str, subtitle: str, eyebrow: str = "STUDYAI") -> None:
     )
 
 
+def section_heading(title: str, subtitle: str = "") -> None:
+    """Render a section title outside a card (bigger sibling of ``.card h3``)."""
+    st.markdown(
+        f"""
+        <div class="section-heading">
+          <p class="title">{html.escape(title)}</p>
+          {f'<p class="subtitle">{html.escape(subtitle)}</p>' if subtitle else ''}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def metric_card(value: str, label: str, note: str = "") -> None:
     """Render a single stat card: bold value, label, optional note."""
     st.markdown(

@@ -18,8 +18,11 @@ def render() -> None:
     st.markdown(
         """
         <div class="login-shell">
-          <div class="logo">S</div>
-          <h1>Welcome to StudyAI</h1>
+          <div class="login-brand">
+            <div class="logo">S</div>
+            <div class="name">StudyAI</div>
+          </div>
+          <p class="tagline">Sign in to continue to your workspace</p>
         </div>
         """,
         unsafe_allow_html=True,

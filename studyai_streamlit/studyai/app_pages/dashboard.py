@@ -18,6 +18,7 @@ from components.ui import (
     hero,
     metric_row,
     progress_row,
+    section_heading,
     tone_for_score,
 )
 from utils.session import get_database, get_vector_store
@@ -80,18 +81,20 @@ def render() -> None:
     )
 
     # ---- Quick actions --------------------------------------------- #
-    action_columns = st.columns(4)
-    quick_actions = [
-        ("Chat with Docs", "chat"),
-        ("Flashcards", "flashcards"),
-        ("Quiz", "quiz"),
-        ("Notes", "notes"),
-    ]
-    for column, (label, target) in zip(action_columns, quick_actions):
-        with column:
-            if st.button(label, key=f"qa_{target}", use_container_width=True):
-                st.session_state.page = target
-                st.rerun()
+    with st.container(border=True):
+        st.markdown('<p class="label">Quick Actions</p>', unsafe_allow_html=True)
+        action_columns = st.columns(4)
+        quick_actions = [
+            ("Chat with Docs", "chat"),
+            ("Flashcards", "flashcards"),
+            ("Quiz", "quiz"),
+            ("Notes", "notes"),
+        ]
+        for column, (label, target) in zip(action_columns, quick_actions):
+            with column:
+                if st.button(label, key=f"qa_{target}", use_container_width=True):
+                    st.session_state.page = target
+                    st.rerun()
 
     st.write("")
 
@@ -157,7 +160,7 @@ def render() -> None:
             st.rerun()
 
     # ---- Agent grid -------------------------------------------------- #
-    st.markdown("### AI Agents")
+    section_heading("AI Agents", "Every one grounded in the documents you've uploaded")
     for row_start in range(0, len(AGENT_TILES), 4):
         row = AGENT_TILES[row_start : row_start + 4]
         columns = st.columns(4)
