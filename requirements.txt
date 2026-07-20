@@ -1,1 +1,0 @@
--r studyai_streamlit/studyai/requirements.txt
