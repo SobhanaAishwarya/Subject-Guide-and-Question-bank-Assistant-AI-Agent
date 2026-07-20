@@ -1,4 +1,4 @@
-# 🎓 StudyAI — Agentic Study Assistant
+# StudyAI — Agentic Study Assistant
 
 A complete Python/Streamlit port of the original Next.js + TypeScript project.
 Upload your study material, and every answer comes back grounded in **your own
@@ -9,33 +9,33 @@ local model SDK is used anywhere in this codebase.
 
 ---
 
-## ✨ What it does
+## What it does
 
 | Feature | Where |
 |---|---|
-| Chat with your documents (streaming, cited) | 💬 Chat |
-| Multi-file upload: PDF, DOCX, PPTX, TXT | 📁 Upload Center |
-| Question answering with page citations | 💬 Chat |
-| Summarization (short / medium / long) | 📝 Notes → Summary |
-| Chapter & topic explanation (4 levels) | 📝 Notes → Explain |
-| Question bank (2/5/10-mark) | 📝 Notes → Question Bank |
-| Important questions | 📝 Notes → Question Bank |
-| Previous paper analysis | 📝 Notes → Previous Papers |
-| Notes generation | 📝 Notes |
-| Quiz generation + auto-grading | ❓ Quiz |
-| Flashcards with Leitner spaced repetition | 🃏 Flashcards |
-| Study planner (day-by-day schedule) | 📅 Planner |
-| Rapid revision sheets | 🔄 Revision |
-| Weak topic diagnostics | ⚠️ Weak Topics |
-| AI mock interviews with grading | 🎤 Interview |
-| Cross-document reasoning | 🔗 Cross Subject |
-| Charts & progress analytics | 📊 Analytics |
-| Related question suggestions | 💬 Chat |
-| Conversation history & session memory | 💬 Chat / 👤 Profile |
+| Chat with your documents (streaming, cited) | Chat |
+| Multi-file upload: PDF, DOCX, PPTX, TXT | Upload Center |
+| Question answering with page citations | Chat |
+| Summarization (short / medium / long) | Notes → Summary |
+| Chapter & topic explanation (4 levels) | Notes → Explain |
+| Question bank (2/5/10-mark) | Notes → Question Bank |
+| Important questions | Notes → Question Bank |
+| Previous paper analysis | Notes → Previous Papers |
+| Notes generation | Notes |
+| Quiz generation + auto-grading | Quiz |
+| Flashcards with Leitner spaced repetition | Flashcards |
+| Study planner (day-by-day schedule) | Planner |
+| Rapid revision sheets | Revision |
+| Weak topic diagnostics | Weak Topics |
+| AI mock interviews with grading | Interview |
+| Cross-document reasoning | Cross Subject |
+| Charts & progress analytics | Analytics |
+| Related question suggestions | Chat |
+| Conversation history & session memory | Chat / Profile |
 
 ---
 
-## 🚀 Quick start (local)
+## Quick start (local)
 
 ```bash
 # 1. Install
@@ -56,7 +56,7 @@ Open http://localhost:8501
 
 ---
 
-## ☁️ Deploy to Streamlit Cloud
+## Deploy to Streamlit Cloud
 
 1. Push this folder to a GitHub repo (`.env` is gitignored — keep it that way).
 2. Go to [share.streamlit.io](https://share.streamlit.io) → **New app**.
@@ -76,7 +76,7 @@ inside Streamlit Cloud's 1 GB limit. Don't remove that line.
 
 ---
 
-## 🧠 How the RAG pipeline works
+## How the RAG pipeline works
 
 ```
 Upload PDF/DOCX/PPTX/TXT
@@ -115,7 +115,7 @@ from that PDF; asking it against an unrelated PDF returns the refusal.
 
 ---
 
-## 📁 Project structure
+## Project structure
 
 ```
 app.py                      Entry point + router
@@ -179,7 +179,7 @@ uploads/ vectorstore/ chat_history/    Runtime data (gitignored)
 
 ---
 
-## 🗺️ TypeScript → Python mapping
+## TypeScript → Python mapping
 
 | Original (Next.js) | Python replacement |
 |---|---|
@@ -199,7 +199,7 @@ uploads/ vectorstore/ chat_history/    Runtime data (gitignored)
 
 ---
 
-## ⚙️ Tuning
+## Tuning
 
 Everything lives in `config.py`:
 
@@ -213,7 +213,7 @@ Everything lives in `config.py`:
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
@@ -227,12 +227,12 @@ Everything lives in `config.py`:
 
 ---
 
-## 🔒 Security
+## Security
 
 - Keys are read from `.env` / Streamlit Secrets — never hardcoded.
 - `.env` and `.streamlit/secrets.toml` are gitignored.
 - Only *retrieved chunks* are sent to OpenRouter, never whole documents.
 
-> ⚠️ The original ZIP had a live OpenRouter key committed in
+> The original ZIP had a live OpenRouter key committed in
 > `.streamlit/secrets.toml`. If that key is still active, **rotate it now** at
 > [openrouter.ai/keys](https://openrouter.ai/keys).
