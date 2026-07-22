@@ -3,6 +3,12 @@ streamlit==1.40.2
 python-dotenv==1.0.1
 requests==2.32.3
 
+# ---- Persistence ----
+# Hosted, libSQL-compatible SQLite. Used only when TURSO_DATABASE_URL /
+# TURSO_AUTH_TOKEN are set (see database/db.py); otherwise the app falls
+# back to a local SQLite file.
+libsql==0.1.11
+
 # ---- RAG / embeddings / vector search ----
 sentence-transformers==3.3.1
 faiss-cpu==1.9.0

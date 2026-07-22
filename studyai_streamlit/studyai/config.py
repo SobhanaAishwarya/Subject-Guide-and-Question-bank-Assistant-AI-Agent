@@ -91,10 +91,24 @@ class Settings:
     max_upload_mb: int = 50
     supported_extensions: tuple[str, ...] = ("pdf", "docx", "pptx", "txt")
 
+    # --- Persistence (Turso) ---
+    # Streamlit Cloud rebuilds the app in a fresh container on every deploy,
+    # which wipes any local SQLite file. Turso is a hosted, libSQL-compatible
+    # SQLite database, so accounts and study data survive redeploys. When
+    # these aren't set, the app falls back to a local SQLite file (fine for
+    # local development, but not for a Cloud deployment that needs persistence).
+    turso_database_url: str = field(default_factory=lambda: _read_secret("TURSO_DATABASE_URL"))
+    turso_auth_token: str = field(default_factory=lambda: _read_secret("TURSO_AUTH_TOKEN"))
+
     @property
     def is_configured(self) -> bool:
         """True when an OpenRouter key is available."""
         return bool(self.openrouter_api_key and self.openrouter_api_key.startswith("sk-"))
+
+    @property
+    def uses_turso(self) -> bool:
+        """True when Turso credentials are available for persistent storage."""
+        return bool(self.turso_database_url and self.turso_auth_token)
 
 
 settings = Settings()
