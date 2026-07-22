@@ -22,7 +22,7 @@ def render() -> None:
             <div class="logo">S</div>
             <div class="name">StudyAI</div>
           </div>
-          <p class="tagline">Study smarter, not harder — with AI by your side.</p>
+          <p class="tagline">Every answer, traced back to your own notes.</p>
         </div>
         """,
         unsafe_allow_html=True,
