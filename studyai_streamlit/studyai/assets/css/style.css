@@ -48,6 +48,19 @@
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
+/* Auth page only: the same gradient as the logo, behind the whole screen. */
+.stApp:has(.login-shell) {
+  background: var(--grad-brand);
+}
+.stApp:has(.login-shell) [data-testid="stTabs"] {
+  background: var(--white);
+  max-width: 408px;
+  margin: 20px auto 0;
+  padding: 14px 20px 6px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
 .block-container {
   padding-top: 1.4rem !important;
   padding-bottom: 4rem !important;
