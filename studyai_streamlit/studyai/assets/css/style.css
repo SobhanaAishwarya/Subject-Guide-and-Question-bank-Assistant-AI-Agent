@@ -55,8 +55,10 @@
 .stApp:has(.login-shell) [data-testid="stTabs"] {
   background: var(--white);
   max-width: 408px;
+  width: 100%;
+  box-sizing: border-box;
   margin: 20px auto 0;
-  padding: 14px 20px 6px;
+  padding: 16px 32px 28px;
   border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
 }
