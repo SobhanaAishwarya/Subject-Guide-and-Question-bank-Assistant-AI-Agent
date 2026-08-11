@@ -46,7 +46,7 @@ cp .env.example .env
 #    then edit .env and paste your OpenRouter key
 
 # 3. Run
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
 
 Open http://localhost:8501
@@ -58,21 +58,66 @@ Open http://localhost:8501
 
 ## Deploy to Streamlit Cloud
 
-1. Push this folder to a GitHub repo (`.env` is gitignored — keep it that way).
+This app is deployed from `agentic_ai_clean` (the repo root, one level above
+this folder), via a thin `streamlit_app.py` shim there that runs this
+folder's `streamlit_app.py`. The steps below assume that layout.
+
+1. Push the repo to GitHub (`.env` and `.streamlit/secrets.toml` are
+   gitignored — keep it that way).
 2. Go to [share.streamlit.io](https://share.streamlit.io) → **New app**.
-3. Main file path: **`app.py`**
-4. Open **Advanced settings → Secrets** and paste:
-
-```toml
-OPENROUTER_API_KEY = "sk-or-v1-your-key-here"
-OPENROUTER_MODEL = "openai/gpt-4o-mini"
-```
-
-5. Deploy. Nothing else to configure.
+3. Main file path: **`streamlit_app.py`** (the one at the repo root, not
+   this folder's).
+4. Open **Advanced settings → Secrets** and paste the contents of
+   `.streamlit/secrets.toml.example` with real values filled in — this
+   **must** include `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN` (see
+   **Persistence** below), or every account anyone signs up will vanish the
+   next time the app redeploys or reboots.
+5. Deploy.
 
 **Resource note:** `sentence-transformers` pulls in PyTorch. `requirements.txt`
 pins the CPU-only wheel via `--extra-index-url` specifically so the build fits
 inside Streamlit Cloud's 1 GB limit. Don't remove that line.
+
+---
+
+## Persistence (Turso)
+
+Streamlit Cloud rebuilds the app in a fresh container on every deploy or
+reboot, which wipes any local SQLite file. Sign-up/sign-in only survives
+across redeploys if the app is pointed at [Turso](https://turso.tech) (a
+free, hosted libSQL/SQLite-compatible database) instead:
+
+1. `turso db create studyai` (after installing the Turso CLI and signing in).
+2. `turso db show studyai` → copy the URL into `TURSO_DATABASE_URL`.
+3. `turso db tokens create studyai` → copy the token into `TURSO_AUTH_TOKEN`.
+4. Put both in your local `.env` (for local dev) **and** in the Streamlit
+   Cloud app's **Settings → Secrets** (for the deployment) — they're
+   separate, both need it.
+
+Without these two variables set, `config.py` silently falls back to a local
+SQLite file (`database/studyai.db`), which is fine for local development but
+not for a Cloud deployment that needs accounts to persist.
+
+### Demo account
+
+`seed_demo.py` creates a fully-populated showcase account
+(`abhi@gmail.com`) with two indexed documents, quiz history, flashcards,
+chat history and a week of activity — useful for demoing the product
+without waiting for a real user to build up that history. Every other
+account (including one you sign up with your own email) starts completely
+empty; documents, chats, quizzes, flashcards and activity are all scoped
+per-user, so nothing seeded here is visible to anyone else.
+
+```bash
+cd studyai_streamlit/studyai
+python seed_demo.py
+```
+
+Run it once, locally, with the **same** `TURSO_DATABASE_URL` /
+`TURSO_AUTH_TOKEN` in your `.env` that the deployed app uses in its
+Secrets — otherwise it only seeds your local SQLite file, and the deployed
+app won't see the demo account. It's idempotent: re-running it is a no-op
+once the account already has data.
 
 ---
 
@@ -118,8 +163,9 @@ from that PDF; asking it against an unrelated PDF returns the refusal.
 ## Project structure
 
 ```
-app.py                      Entry point + router
+streamlit_app.py             Entry point + router
 config.py                   Settings, paths, model catalogue, nav
+seed_demo.py                 One-off script: seeds the abhi@gmail.com demo account
 requirements.txt
 README.md
 .env.example

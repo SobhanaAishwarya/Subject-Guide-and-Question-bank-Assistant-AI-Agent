@@ -9,12 +9,12 @@ agents, database).
 from __future__ import annotations
 
 import uuid
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import streamlit as st
 
-from config import settings
-from database.db import Database, get_db
+from config import settings, VECTORSTORE_DIR
+from database.db import Database, UserScopedDB, get_db
 from models.schemas import Message
 from services.agents import AgentService
 from services.openrouter_client import OpenRouterClient
@@ -65,18 +65,34 @@ def init_session() -> None:
 # --------------------------------------------------------------------------- #
 # Cached singletons
 # --------------------------------------------------------------------------- #
+def current_user_id() -> Optional[int]:
+    """The signed-in user's id, or ``None`` before login."""
+    return st.session_state.user.get("id")
+
+
 @st.cache_resource(show_spinner=False)
-def get_vector_store() -> VectorStore:
-    """Shared FAISS store, restored from disk on first access."""
-    store = VectorStore()
+def _load_vector_store(user_id: Optional[int]) -> VectorStore:
+    """One FAISS store per user, restored from disk on first access."""
+    store = VectorStore(store_dir=VECTORSTORE_DIR / str(user_id))
     store.load()
     return store
 
 
+def get_vector_store() -> VectorStore:
+    """The signed-in user's FAISS store."""
+    return _load_vector_store(current_user_id())
+
+
 @st.cache_resource(show_spinner=False)
-def get_database() -> Database:
-    """Shared SQLite handle."""
+def _shared_database() -> Database:
+    """The single raw database connection, shared by every user."""
     return get_db()
+
+
+def get_database() -> UserScopedDB:
+    """The signed-in user's view of the database — every query pre-scoped
+    to their own rows."""
+    return UserScopedDB(_shared_database(), current_user_id())
 
 
 def get_llm() -> OpenRouterClient:
