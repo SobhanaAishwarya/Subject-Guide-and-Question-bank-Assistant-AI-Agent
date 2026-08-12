@@ -96,6 +96,17 @@ _SCHEMA_STATEMENTS = [
         created_at TEXT NOT NULL,
         user_id    INTEGER NOT NULL DEFAULT 0
     )""",
+    # The FAISS index, chunk list and doc metadata for one user's vector
+    # store, mirrored here so it survives a fresh container the same way the
+    # tables above do — local disk under vectorstore/<user_id>/ is just a
+    # fast-path cache of this row (see VectorStore's ``remote`` parameter).
+    """CREATE TABLE IF NOT EXISTS vector_stores (
+        user_id     INTEGER PRIMARY KEY,
+        index_blob  BLOB NOT NULL,
+        chunks_blob BLOB NOT NULL,
+        meta_json   TEXT NOT NULL DEFAULT '{}',
+        updated_at  TEXT NOT NULL
+    )""",
 ]
 
 # Tables that predate per-user scoping and may not have a user_id column yet
@@ -483,6 +494,41 @@ class Database:
             rows = self._many(cursor, cursor.fetchall())
         return list(reversed(rows))
 
+    # ------------------------------------------------------------------ #
+    # Vector store (user-scoped) — remote backing for VectorStore, so the
+    # FAISS index + chunks survive a fresh container the same way every
+    # other table here does.
+    # ------------------------------------------------------------------ #
+    def save_vector_store(
+        self, user_id: int, index_blob: bytes, chunks_blob: bytes, meta_json: str,
+    ) -> None:
+        with self.connect() as connection:
+            connection.execute(
+                "DELETE FROM vector_stores WHERE user_id = ?", (user_id,)
+            )
+            connection.execute(
+                """INSERT INTO vector_stores
+                   (user_id, index_blob, chunks_blob, meta_json, updated_at)
+                   VALUES (?, ?, ?, ?, ?)""",
+                (user_id, index_blob, chunks_blob, meta_json,
+                 datetime.utcnow().isoformat()),
+            )
+
+    def load_vector_store(self, user_id: int) -> Optional[Dict[str, Any]]:
+        with self.connect() as connection:
+            cursor = connection.execute(
+                "SELECT index_blob, chunks_blob, meta_json FROM vector_stores "
+                "WHERE user_id = ?",
+                (user_id,),
+            )
+            return self._one(cursor, cursor.fetchone())
+
+    def delete_vector_store(self, user_id: int) -> None:
+        with self.connect() as connection:
+            connection.execute(
+                "DELETE FROM vector_stores WHERE user_id = ?", (user_id,)
+            )
+
 
 class UserScopedDB:
     """
@@ -572,6 +618,28 @@ class UserScopedDB:
 
     def activity_by_day(self, days: int = 14) -> List[Dict[str, Any]]:
         return self._db.activity_by_day(self._user_id, days)
+
+
+class RemoteVectorBackend:
+    """
+    Adapts a :class:`Database` + user id into the tiny load/save/delete
+    interface :class:`services.vectorstore.VectorStore` uses for optional
+    remote persistence — so the FAISS index survives a fresh container
+    instead of only ever living on local disk.
+    """
+
+    def __init__(self, db: Database, user_id: int) -> None:
+        self._db = db
+        self._user_id = user_id
+
+    def load(self) -> Optional[Dict[str, Any]]:
+        return self._db.load_vector_store(self._user_id)
+
+    def save(self, index_blob: bytes, chunks_blob: bytes, meta_json: str) -> None:
+        self._db.save_vector_store(self._user_id, index_blob, chunks_blob, meta_json)
+
+    def delete(self) -> None:
+        self._db.delete_vector_store(self._user_id)
 
 
 _db: Optional[Database] = None

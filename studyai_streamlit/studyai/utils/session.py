@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Optional
 import streamlit as st
 
 from config import settings, VECTORSTORE_DIR
-from database.db import Database, UserScopedDB, get_db
+from database.db import Database, RemoteVectorBackend, UserScopedDB, get_db
 from models.schemas import Message
 from services.agents import AgentService
 from services.openrouter_client import OpenRouterClient
@@ -72,8 +72,10 @@ def current_user_id() -> Optional[int]:
 
 @st.cache_resource(show_spinner=False)
 def _load_vector_store(user_id: Optional[int]) -> VectorStore:
-    """One FAISS store per user, restored from disk on first access."""
-    store = VectorStore(store_dir=VECTORSTORE_DIR / str(user_id))
+    """One FAISS store per user, restored from disk (or the remote backend,
+    on a fresh container) on first access."""
+    remote = RemoteVectorBackend(_shared_database(), user_id) if user_id is not None else None
+    store = VectorStore(store_dir=VECTORSTORE_DIR / str(user_id), remote=remote)
     store.load()
     return store
 

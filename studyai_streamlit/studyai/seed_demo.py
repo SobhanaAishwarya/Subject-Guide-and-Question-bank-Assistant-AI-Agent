@@ -26,7 +26,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from config import VECTORSTORE_DIR  # noqa: E402
-from database.db import Database  # noqa: E402
+from database.db import Database, RemoteVectorBackend  # noqa: E402
 from models.schemas import Document  # noqa: E402
 from services.auth import hash_password  # noqa: E402
 from services.document_processor import DocumentProcessor  # noqa: E402
@@ -358,7 +358,8 @@ def main() -> None:
         print(f"Sign in with: {DEMO_EMAIL} / {DEMO_PASSWORD}")
         return
 
-    store = VectorStore(store_dir=VECTORSTORE_DIR / str(user_id))
+    remote = RemoteVectorBackend(db, user_id)
+    store = VectorStore(store_dir=VECTORSTORE_DIR / str(user_id), remote=remote)
     store.load()
 
     print("Indexing demo documents (downloads the embedding model on first run)...")

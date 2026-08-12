@@ -12,7 +12,7 @@ from __future__ import annotations
 import json
 import pickle
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Protocol, Sequence
 
 import numpy as np
 
@@ -28,17 +28,37 @@ _CHUNKS_FILE = "chunks.pkl"
 _META_FILE = "meta.json"
 
 
+class RemoteVectorStoreBackend(Protocol):
+    """What :class:`VectorStore` needs from an optional remote backend —
+    see ``database.db.RemoteVectorBackend`` for the real implementation."""
+
+    def load(self) -> Optional[Dict[str, Any]]: ...
+    def save(self, index_blob: bytes, chunks_blob: bytes, meta_json: str) -> None: ...
+    def delete(self) -> None: ...
+
+
 class VectorStore:
-    """A persistent FAISS index paired with its chunk metadata."""
+    """
+    A persistent FAISS index paired with its chunk metadata.
+
+    Local disk (``store_dir``) is always the fast path: it's what every
+    read and write actually operates on. When a ``remote`` backend is
+    supplied, ``save()``/``clear()`` also mirror to it, and ``load()``
+    falls back to pulling from it when local disk is empty — which is what
+    happens on Streamlit Cloud after a redeploy, since the container's
+    local filesystem doesn't survive one but the remote database does.
+    """
 
     def __init__(
         self,
         store_dir: Optional[Path] = None,
         embedder: Optional[EmbeddingService] = None,
+        remote: Optional[RemoteVectorStoreBackend] = None,
     ) -> None:
         self.store_dir: Path = Path(store_dir or VECTORSTORE_DIR)
         self.store_dir.mkdir(parents=True, exist_ok=True)
         self.embedder: EmbeddingService = embedder or get_embedding_service()
+        self.remote = remote
 
         self._index = None
         self.chunks: List[Chunk] = []
@@ -116,7 +136,7 @@ class VectorStore:
         return removed
 
     def clear(self) -> None:
-        """Wipe the in-memory index and the persisted files."""
+        """Wipe the in-memory index, the persisted files, and the remote copy."""
         self._index = self._new_index()
         self.chunks = []
         self.meta = {}
@@ -124,6 +144,11 @@ class VectorStore:
             path = self.store_dir / filename
             if path.exists():
                 path.unlink()
+        if self.remote is not None:
+            try:
+                self.remote.delete()
+            except Exception as exc:  # noqa: BLE001 - remote sync is best-effort
+                logger.error("Failed to clear remote vector store: %s", exc)
         logger.info("Vector store cleared")
 
     # ------------------------------------------------------------------ #
@@ -166,7 +191,7 @@ class VectorStore:
             if len(results) >= k:
                 break
 
-        logger.info("Search '%s' → %s hits above %.2f",
+        logger.info("Search '%s' -> %s hits above %.2f",
                     query[:60], len(results), floor)
         return results
 
@@ -174,7 +199,9 @@ class VectorStore:
     # Persistence
     # ------------------------------------------------------------------ #
     def save(self) -> None:
-        """Persist index, chunks and metadata to disk."""
+        """Persist index, chunks and metadata to disk, and mirror them to
+        the remote backend (if configured) so a fresh container isn't
+        starting from nothing."""
         import faiss
 
         try:
@@ -186,13 +213,53 @@ class VectorStore:
             logger.info("Vector store saved (%s chunks)", self.size)
         except Exception as exc:  # noqa: BLE001 - persistence is best-effort
             logger.error("Failed to save vector store: %s", exc)
+            return
+
+        if self.remote is not None:
+            try:
+                self.remote.save(
+                    (self.store_dir / _INDEX_FILE).read_bytes(),
+                    (self.store_dir / _CHUNKS_FILE).read_bytes(),
+                    json.dumps(self.meta),
+                )
+                logger.info("Vector store synced to remote backend")
+            except Exception as exc:  # noqa: BLE001 - remote sync is best-effort
+                logger.error("Failed to sync vector store to remote backend: %s", exc)
+
+    def _pull_remote(self) -> bool:
+        """Restore local disk from the remote backend. Returns True if it
+        had something to restore."""
+        if self.remote is None:
+            return False
+        try:
+            row = self.remote.load()
+            if not row or not row.get("index_blob"):
+                return False
+            self.store_dir.mkdir(parents=True, exist_ok=True)
+            (self.store_dir / _INDEX_FILE).write_bytes(row["index_blob"])
+            (self.store_dir / _CHUNKS_FILE).write_bytes(row["chunks_blob"])
+            (self.store_dir / _META_FILE).write_text(
+                row.get("meta_json") or "{}", encoding="utf-8"
+            )
+            logger.info("Vector store restored from remote backend")
+            return True
+        except Exception as exc:  # noqa: BLE001 - remote sync is best-effort
+            logger.error("Failed to restore vector store from remote backend: %s", exc)
+            return False
 
     def load(self) -> bool:
-        """Restore a previously saved store. Returns True on success."""
+        """Restore a previously saved store. Returns True on success.
+
+        Prefers local disk (the fast path within one running container);
+        falls back to the remote backend when local disk is empty, which
+        is exactly the state a fresh Streamlit Cloud container starts in.
+        """
         import faiss
 
         index_path = self.store_dir / _INDEX_FILE
         chunks_path = self.store_dir / _CHUNKS_FILE
+        if not (index_path.exists() and chunks_path.exists()):
+            self._pull_remote()
         if not (index_path.exists() and chunks_path.exists()):
             return False
 
