@@ -161,23 +161,20 @@ def render() -> None:
 
     # ---- Agent grid -------------------------------------------------- #
     section_heading("AI Agents", "Every one grounded in the documents you've uploaded")
-    for row_start in range(0, len(AGENT_TILES), 4):
-        row = AGENT_TILES[row_start : row_start + 4]
-        columns = st.columns(4)
-        for column, tile in zip(columns, row):
-            with column:
-                st.markdown(
-                    f"""
-                    <div class="agent-tile">
-                      <div class="title">{html.escape(tile['label'])}</div>
-                      <div class="desc">{html.escape(tile['desc'])}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-                if st.button("Open", key=f"tile_{tile['id']}", use_container_width=True):
-                    st.session_state.page = tile["id"]
-                    st.rerun()
+    with st.container(key="agent_grid"):
+        for row_start in range(0, len(AGENT_TILES), 4):
+            row = AGENT_TILES[row_start : row_start + 4]
+            columns = st.columns(4)
+            for column, tile in zip(columns, row):
+                with column:
+                    clicked = st.button(
+                        f"**{tile['label']}**\n\n{tile['desc']}",
+                        key=f"tile_{tile['id']}",
+                        use_container_width=True,
+                    )
+                    if clicked:
+                        st.session_state.page = tile["id"]
+                        st.rerun()
 
     st.write("")
     bottom_left, bottom_right = st.columns(2)
