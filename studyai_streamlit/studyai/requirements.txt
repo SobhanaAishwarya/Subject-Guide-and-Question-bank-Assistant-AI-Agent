@@ -1,7 +1,11 @@
 # ---- Core ----
 streamlit==1.40.2
 python-dotenv==1.0.1
-requests==2.32.3
+# Unpinned on purpose: Streamlit Cloud's uv installer resolves each package
+# from only the first index that lists it, and pytorch's --extra-index-url
+# below also happens to list `requests` (an older build) - pinning an exact
+# version here that isn't on that index makes the whole install unsatisfiable.
+requests
 
 # ---- Persistence ----
 # Hosted, libSQL-compatible SQLite. Used only when TURSO_DATABASE_URL /
