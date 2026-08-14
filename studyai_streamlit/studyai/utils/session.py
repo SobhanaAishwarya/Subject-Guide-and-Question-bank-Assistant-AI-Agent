@@ -26,6 +26,7 @@ logger = get_logger(__name__)
 
 _DEFAULTS: Dict[str, Any] = {
     "authenticated": False,
+    "splash_shown": False,   # one-time logo splash at the start of each session
     "page": "dashboard",
     "user": {
         "id": None,

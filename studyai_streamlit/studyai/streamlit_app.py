@@ -18,6 +18,8 @@ The only outbound LLM provider is OpenRouter (https://openrouter.ai/api/v1).
 
 from __future__ import annotations
 
+import time
+
 import streamlit as st
 
 # --------------------------------------------------------------------------- #
@@ -55,6 +57,25 @@ from utils.session import init_session  # noqa: E402
 
 logger = get_logger(__name__)
 
+SPLASH_SECONDS = 30
+
+
+def _show_splash() -> None:
+    """One-time logo splash at the start of each browser session, before
+    the Sign In / Sign Up gate."""
+    st.markdown(
+        """
+        <div class="splash-screen">
+          <div class="splash-logo">S</div>
+          <div class="splash-name">StudyAI</div>
+          <div class="splash-tag">Agentic Study Assistant</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    time.sleep(SPLASH_SECONDS)
+
+
 # Page id → render function. Mirrors ``Page`` in the original src/app/page.tsx.
 ROUTES = {
     "dashboard": dashboard.render,
@@ -77,6 +98,12 @@ def main() -> None:
     """Boot the application and dispatch to the active page."""
     init_session()
     load_css()
+
+    # Logo splash — once per session, before the Sign In / Sign Up gate.
+    if not st.session_state.splash_shown:
+        _show_splash()
+        st.session_state.splash_shown = True
+        st.rerun()
 
     # Auth gate (mirrors the LoginPage gate in the original app).
     if not st.session_state.authenticated:
