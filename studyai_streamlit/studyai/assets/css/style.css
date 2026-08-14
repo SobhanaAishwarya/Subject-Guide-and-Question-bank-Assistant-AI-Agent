@@ -219,6 +219,17 @@ p, li, span, label { color: var(--ink-soft); }
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   margin-bottom: 14px;
   animation: fadeUp 0.42s ease;
+  /* st.info()/st.radio() etc. carry Streamlit's own default block width,
+     which can run a hair wider than a custom-padded container and poke
+     past the rounded corner. Clip it at the card edge, and make sure
+     nothing inside is explicitly wider than the padded content box. */
+  overflow: hidden;
+}
+.st-key-weak_measured_card *,
+[class*="st-key-weak_topic_card_"] *,
+[class*="st-key-quiz_card_"] * {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .card:hover,
 .st-key-weak_measured_card:hover,
