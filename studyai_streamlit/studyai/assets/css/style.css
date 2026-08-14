@@ -84,6 +84,14 @@ p, li, span, label { color: var(--ink-soft); }
 }
 [data-testid="stSidebar"] .block-container { padding-top: 1.2rem; }
 [data-testid="stSidebar"] * { color: var(--white) !important; }
+/* The blanket white-text rule above also hits the model selectbox's own
+   light dropdown surface, making the selected value white-on-white.
+   That control isn't part of the dark sidebar chrome, so give it dark
+   text back — higher specificity than the rule above wins regardless of
+   source order. */
+[data-testid="stSidebar"] [data-baseweb="select"] * {
+  color: var(--ink) !important;
+}
 
 .sidebar-brand {
   display: flex; align-items: center; gap: 12px;
