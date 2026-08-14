@@ -459,7 +459,18 @@ p.label {
   font-size: 13px; color: var(--ink-faint); margin: 0 0 22px;
 }
 
-/* ---------- Splash (one-time, on session start) ---------- */
+/* ---------- Splash (one-time, on session start) ----------
+   A moody navy field with soft ambient color glow, NOT the same gradient
+   as the logo tile itself — if both used --grad-brand the bright tile
+   would blend into an identically-colored backdrop instead of standing
+   out against it. */
+.stApp:has(.splash-screen) {
+  background:
+    radial-gradient(440px circle at 50% 38%, rgba(255, 159, 0, 0.26), transparent 70%),
+    radial-gradient(620px circle at 14% 85%, rgba(40, 116, 240, 0.38), transparent 65%),
+    radial-gradient(560px circle at 88% 12%, rgba(255, 229, 0, 0.14), transparent 60%),
+    radial-gradient(circle at 50% 32%, #1A56C4 0%, #131921 62%, #0B0F16 100%);
+}
 .splash-screen {
   min-height: 82vh;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -474,17 +485,17 @@ p.label {
   border-radius: 22px;
   background: var(--grad-brand);
   box-shadow:
-    0 24px 48px rgba(40, 116, 240, 0.45),
-    0 10px 20px rgba(17, 24, 39, 0.22),
-    0 2px 6px rgba(17, 24, 39, 0.14);
+    0 24px 56px rgba(255, 159, 0, 0.38),
+    0 10px 26px rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.35);
   margin-bottom: 18px;
   animation: float 2.4s ease-in-out infinite;
 }
 .splash-name {
-  font-size: 26px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em;
+  font-size: 26px; font-weight: 800; color: #FFFFFF !important; letter-spacing: -0.01em;
 }
 .splash-tag {
-  font-size: 13px; color: var(--ink-faint); margin-top: 6px;
+  font-size: 13px; color: rgba(255, 255, 255, 0.68) !important; margin-top: 6px;
 }
 
 /* ---------- Empty state ---------- */
