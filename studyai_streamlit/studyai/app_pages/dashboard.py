@@ -132,7 +132,7 @@ def render() -> None:
                 by_subject.items(), key=lambda kv: kv[1], reverse=True
             ):
                 share = int(round(chunk_count / total_chunks * 100))
-                progress_row(subject, share, tone="good" if share >= 30 else "")
+                progress_row(subject, share)
         st.markdown("</div>", unsafe_allow_html=True)
 
         if st.button("Upload more documents", key="dash_upload"):
