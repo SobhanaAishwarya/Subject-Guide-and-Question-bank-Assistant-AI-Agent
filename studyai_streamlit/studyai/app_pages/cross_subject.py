@@ -82,9 +82,7 @@ def render() -> None:
                         "Your documents don't seem to cover that.")
             return
 
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown(analysis)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(f'<div class="card">\n\n{analysis}\n\n</div>', unsafe_allow_html=True)
 
         render_sources(sources)
         get_database().log_activity("Cross-subject analysis", icon="CS",

@@ -60,9 +60,7 @@ def render() -> None:
                 st.error(f"Planning failed: {exc}")
                 return
 
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown(plan)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(f'<div class="card">\n\n{plan}\n\n</div>', unsafe_allow_html=True)
 
         render_sources(sources)
         get_database().log_activity(f"Built a {days}-day plan for {subject}",

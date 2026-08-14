@@ -194,8 +194,17 @@ p, li, span, label { color: var(--ink-soft); }
   padding: 3px 10px; border-radius: 99px;
 }
 
-/* ---------- Cards ---------- */
-.card {
+/* ---------- Cards ----------
+   .card is the raw-HTML version (a single st.markdown call wrapping plain
+   text). The st-key-* selectors are its st.container(key=...) equivalent,
+   used wherever real widgets (st.radio, st.info, ...) need to live inside
+   a card — those can't go through a raw HTML string. Substring attribute
+   selectors ([class*=]) match every numbered instance from a loop
+   (quiz_card_0, quiz_card_1, ...) without needing a rule per index. */
+.card,
+.st-key-weak_measured_card,
+[class*="st-key-weak_topic_card_"],
+[class*="st-key-quiz_card_"] {
   background: var(--white);
   border: 1px solid var(--line);
   border-top: 3px solid var(--primary);
@@ -206,7 +215,12 @@ p, li, span, label { color: var(--ink-soft); }
   margin-bottom: 14px;
   animation: fadeUp 0.42s ease;
 }
-.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-top-color: var(--accent); }
+.card:hover,
+.st-key-weak_measured_card:hover,
+[class*="st-key-weak_topic_card_"]:hover,
+[class*="st-key-quiz_card_"]:hover {
+  transform: translateY(-3px); box-shadow: var(--shadow-md); border-top-color: var(--accent);
+}
 .card h3 {
   margin: 0 0 16px; font-size: 12.5px; font-weight: 800;
   text-transform: uppercase; letter-spacing: 0.06em;

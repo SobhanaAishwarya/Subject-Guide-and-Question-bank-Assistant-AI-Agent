@@ -112,38 +112,36 @@ def render() -> None:
 
     # ---- Questions ------------------------------------------------------ #
     for index, question in enumerate(questions):
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown(f"**Q{index + 1}. {question['question']}**")
+        with st.container(key=f"quiz_card_{index}"):
+            st.markdown(f"**Q{index + 1}. {question['question']}**")
 
-        submitted = st.session_state.quiz_submitted
-        choice = st.radio(
-            "Select an answer",
-            options=list(range(len(question["options"]))),
-            format_func=lambda i, q=question: q["options"][i],
-            key=f"q_{index}",
-            index=None,
-            disabled=submitted,
-            label_visibility="collapsed",
-        )
-        if choice is not None and not submitted:
-            st.session_state.quiz_answers[index] = choice
+            submitted = st.session_state.quiz_submitted
+            choice = st.radio(
+                "Select an answer",
+                options=list(range(len(question["options"]))),
+                format_func=lambda i, q=question: q["options"][i],
+                key=f"q_{index}",
+                index=None,
+                disabled=submitted,
+                label_visibility="collapsed",
+            )
+            if choice is not None and not submitted:
+                st.session_state.quiz_answers[index] = choice
 
-        if submitted:
-            given = st.session_state.quiz_answers.get(index)
-            correct = question["answer_index"]
-            if given == correct:
-                st.success(f"Correct — {question['options'][correct]}")
-            else:
-                given_text = (question["options"][given]
-                              if given is not None else "no answer")
-                st.error(f"You chose: {given_text}  \n"
-                         f"Correct: {question['options'][correct]}")
-            if question.get("explanation"):
-                st.info(question["explanation"])
-            if question.get("source"):
-                st.caption(f"Source: {question['source']}")
-
-        st.markdown("</div>", unsafe_allow_html=True)
+            if submitted:
+                given = st.session_state.quiz_answers.get(index)
+                correct = question["answer_index"]
+                if given == correct:
+                    st.success(f"Correct — {question['options'][correct]}")
+                else:
+                    given_text = (question["options"][given]
+                                  if given is not None else "no answer")
+                    st.error(f"You chose: {given_text}  \n"
+                             f"Correct: {question['options'][correct]}")
+                if question.get("explanation"):
+                    st.info(question["explanation"])
+                if question.get("source"):
+                    st.caption(f"Source: {question['source']}")
 
     # ---- Submit / results ------------------------------------------------ #
     if not st.session_state.quiz_submitted:

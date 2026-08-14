@@ -53,9 +53,7 @@ def render() -> None:
                 st.error(f"Generation failed: {exc}")
                 return
 
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown(sheet)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(f'<div class="card">\n\n{sheet}\n\n</div>', unsafe_allow_html=True)
 
         render_sources(sources)
         get_database().log_activity(f"Revised {topic}", icon="RV",

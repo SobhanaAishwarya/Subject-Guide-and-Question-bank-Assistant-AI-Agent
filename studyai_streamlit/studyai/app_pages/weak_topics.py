@@ -43,8 +43,6 @@ def render() -> None:
     # ---- Measured weakness from quiz history -------------------------- #
     attempts = db.list_quiz_attempts()
     if attempts:
-        st.markdown('<div class="card"><h3>Measured from your quizzes</h3>',
-                    unsafe_allow_html=True)
         by_topic: dict[str, list[int]] = {}
         for attempt in attempts:
             percentage = int(round(attempt["score"] / max(attempt["total"], 1) * 100))
@@ -54,9 +52,10 @@ def render() -> None:
             ((topic, sum(scores) // len(scores)) for topic, scores in by_topic.items()),
             key=lambda kv: kv[1],
         )
-        for topic, average in rows:
-            progress_row(topic, average, tone=tone_for_score(average))
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container(key="weak_measured_card"):
+            st.markdown("### Measured from your quizzes")
+            for topic, average in rows:
+                progress_row(topic, average, tone=tone_for_score(average))
 
         if len(rows) > 1:
             frame = pd.DataFrame(rows, columns=["Topic", "Average %"])
@@ -99,15 +98,14 @@ def render() -> None:
                         "Not enough material on that subject to analyse.")
             return
 
-        for topic in topics:
-            st.markdown('<div class="card">', unsafe_allow_html=True)
-            progress_row(topic["name"], topic["score"],
-                         tone=tone_for_score(topic["score"]))
-            if topic.get("reason"):
-                st.markdown(f"**Why it's hard:** {topic['reason']}")
-            if topic.get("action"):
-                st.info(f"**Next step:** {topic['action']}")
-            st.markdown("</div>", unsafe_allow_html=True)
+        for index, topic in enumerate(topics):
+            with st.container(key=f"weak_topic_card_{index}"):
+                progress_row(topic["name"], topic["score"],
+                             tone=tone_for_score(topic["score"]))
+                if topic.get("reason"):
+                    st.markdown(f"**Why it's hard:** {topic['reason']}")
+                if topic.get("action"):
+                    st.info(f"**Next step:** {topic['action']}")
 
         render_sources(sources)
         db.log_activity(f"Analysed weak topics in {subject}", icon="WT",
