@@ -57,7 +57,7 @@ from utils.session import init_session  # noqa: E402
 
 logger = get_logger(__name__)
 
-SPLASH_SECONDS = 30
+SPLASH_SECONDS = 5
 
 
 def _show_splash() -> None:
