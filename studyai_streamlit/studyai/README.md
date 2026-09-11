@@ -9,6 +9,18 @@ local model SDK is used anywhere in this codebase.
 
 ---
 
+## Screenshots
+
+| Sign in | Dashboard |
+| --- | --- |
+| ![Sign in](screenshots/01-sign-in.png) | ![Dashboard](screenshots/02-dashboard.png) |
+
+| Sign up |
+| --- |
+| ![Sign up](screenshots/03-sign-up.png) |
+
+---
+
 ## What it does
 
 | Feature | Where |
