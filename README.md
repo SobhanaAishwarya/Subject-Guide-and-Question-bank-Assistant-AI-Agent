@@ -1,7 +1,7 @@
 # Subject Guide & Question Bank Assistant (AI Agent)
 
 An agentic study assistant, built with Python/Streamlit. Upload your own study
-material — PDF, DOCX, PPTX, TXT — and every answer, summary, quiz question,
+material :  PDF, DOCX, PPTX, TXT and every answer, summary, quiz question,
 flashcard, or mock-interview question it generates is grounded in *your*
 documents, with citations, powered entirely by OpenRouter.
 
