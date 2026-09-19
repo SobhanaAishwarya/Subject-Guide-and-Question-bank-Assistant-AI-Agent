@@ -1,4 +1,4 @@
-# StudyAI — Subject Guide & Question Bank Assistant (AI Agent)
+# Subject Guide & Question Bank Assistant (AI Agent)
 
 An agentic study assistant, built with Python/Streamlit. Upload your own study
 material — PDF, DOCX, PPTX, TXT — and every answer, summary, quiz question,
