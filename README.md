@@ -1,8 +1,8 @@
-# StudyAI — Subject Guide & Question Bank Assistant
+# StudyAI - Subject Guide & Question Bank Assistant
 
 A retrieval-augmented study assistant. Upload your own notes, textbooks or
 slides, and every answer, summary, quiz question, flashcard and mock-interview
-question is generated **from those documents, with citations** — and when the
+question is generated **from those documents, with citations** - and when the
 answer isn't in them, it says so instead of guessing.
 
 Python · Streamlit · Sentence Transformers · FAISS · OpenRouter
@@ -10,7 +10,7 @@ Python · Streamlit · Sentence Transformers · FAISS · OpenRouter
 ## The problem
 
 General-purpose chatbots answer exam questions confidently, but not
-necessarily from the syllabus a student is actually being tested on — and
+necessarily from the syllabus a student is actually being tested on - and
 they rarely admit when they don't know. Students need answers tied to
 *their* material, with a way to check where each answer came from.
 
