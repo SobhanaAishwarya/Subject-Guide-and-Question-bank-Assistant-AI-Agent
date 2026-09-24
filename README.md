@@ -110,3 +110,7 @@ deployment and persistence notes are in
 - Evaluate retrieval quality on a small labelled question set (hit rate, faithfulness)
 - Hybrid search (BM25 + embeddings) and a re-ranker for better top-k results
 - OCR for scanned PDFs
+
+---
+
+© 2026 Kantapalli Sobhana Aishwarya. All rights reserved. Shared for portfolio viewing; please ask before reusing.
