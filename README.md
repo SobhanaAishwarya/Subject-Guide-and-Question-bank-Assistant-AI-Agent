@@ -5,7 +5,6 @@ slides, and every answer, summary, quiz question, flashcard and mock-interview
 question is generated **from those documents, with citations** — and when the
 answer isn't in them, it says so instead of guessing.
 
-**[Live demo](https://subject-guide-and-question-bank-assistant-ai-agent-jtomhsyrpfj.streamlit.app/)** ·
 Python · Streamlit · Sentence Transformers · FAISS · OpenRouter
 
 ## The problem
