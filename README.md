@@ -56,13 +56,29 @@ database (Turso) when deployed.
 
 ## Screenshots
 
-| Sign in | Dashboard |
+| Dashboard | Upload Center |
 | --- | --- |
-| ![Sign in](studyai_streamlit/studyai/screenshots/01-sign-in.png) | ![Dashboard](studyai_streamlit/studyai/screenshots/02-dashboard.png) |
+| ![Dashboard](studyai_streamlit/studyai/screenshots/04-dashboard.jpg) | ![Upload Center](studyai_streamlit/studyai/screenshots/05-upload-center.jpg) |
 
-| Sign up |
-| --- |
-| ![Sign up](studyai_streamlit/studyai/screenshots/03-sign-up.png) |
+| Chat with Docs (cited answer) | Notes Agent |
+| --- | --- |
+| ![Chat with Docs (cited answer)](studyai_streamlit/studyai/screenshots/06-chat-with-docs.jpg) | ![Notes Agent](studyai_streamlit/studyai/screenshots/07-notes-agent.jpg) |
+
+| Quiz Agent | Flashcard Agent |
+| --- | --- |
+| ![Quiz Agent](studyai_streamlit/studyai/screenshots/08-quiz-agent.jpg) | ![Flashcard Agent](studyai_streamlit/studyai/screenshots/09-flashcards.jpg) |
+
+| Planner Agent | Revision Agent |
+| --- | --- |
+| ![Planner Agent](studyai_streamlit/studyai/screenshots/10-planner-agent.jpg) | ![Revision Agent](studyai_streamlit/studyai/screenshots/11-revision-agent.jpg) |
+
+| Weak Topics | Interview Mode |
+| --- | --- |
+| ![Weak Topics](studyai_streamlit/studyai/screenshots/12-weak-topics.jpg) | ![Interview Mode](studyai_streamlit/studyai/screenshots/13-interview-mode.jpg) |
+
+| Analytics | Sign in |
+| --- | --- |
+| ![Analytics](studyai_streamlit/studyai/screenshots/14-analytics.jpg) | ![Sign in](studyai_streamlit/studyai/screenshots/01-sign-in.png) |
 
 ## Tech stack
 
