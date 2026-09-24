@@ -1,8 +1,8 @@
-# StudyAI — Agentic Study Assistant
+# StudyAI - Agentic Study Assistant
 
 A complete Python/Streamlit port of the original Next.js + TypeScript project.
 Upload your study material, and every answer comes back grounded in **your own
-documents** — with citations, and an honest refusal when the answer isn't there.
+documents** - with citations, and an honest refusal when the answer isn't there.
 
 Powered entirely by **OpenRouter**. No OpenAI, Gemini, Anthropic, Azure, Groq or
 local model SDK is used anywhere in this codebase.
@@ -75,12 +75,12 @@ this folder), via a thin `streamlit_app.py` shim there that runs this
 folder's `streamlit_app.py`. The steps below assume that layout.
 
 1. Push the repo to GitHub (`.env` and `.streamlit/secrets.toml` are
-   gitignored — keep it that way).
+   gitignored - keep it that way).
 2. Go to [share.streamlit.io](https://share.streamlit.io) → **New app**.
 3. Main file path: **`streamlit_app.py`** (the one at the repo root, not
    this folder's).
 4. Open **Advanced settings → Secrets** and paste the contents of
-   `.streamlit/secrets.toml.example` with real values filled in — this
+   `.streamlit/secrets.toml.example` with real values filled in - this
    **must** include `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN` (see
    **Persistence** below), or every account anyone signs up will vanish the
    next time the app redeploys or reboots.
@@ -103,7 +103,7 @@ free, hosted libSQL/SQLite-compatible database) instead:
 2. `turso db show studyai` → copy the URL into `TURSO_DATABASE_URL`.
 3. `turso db tokens create studyai` → copy the token into `TURSO_AUTH_TOKEN`.
 4. Put both in your local `.env` (for local dev) **and** in the Streamlit
-   Cloud app's **Settings → Secrets** (for the deployment) — they're
+   Cloud app's **Settings → Secrets** (for the deployment) - they're
    separate, both need it.
 
 Without these two variables set, `config.py` silently falls back to a local
@@ -114,7 +114,7 @@ not for a Cloud deployment that needs accounts to persist.
 
 `seed_demo.py` creates a fully-populated showcase account
 (`abhi@gmail.com`) with two indexed documents, quiz history, flashcards,
-chat history and a week of activity — useful for demoing the product
+chat history and a week of activity - useful for demoing the product
 without waiting for a real user to build up that history. Every other
 account (including one you sign up with your own email) starts completely
 empty; documents, chats, quizzes, flashcards and activity are all scoped
@@ -127,7 +127,7 @@ python seed_demo.py
 
 Run it once, locally, with the **same** `TURSO_DATABASE_URL` /
 `TURSO_AUTH_TOKEN` in your `.env` that the deployed app uses in its
-Secrets — otherwise it only seeds your local SQLite file, and the deployed
+Secrets - otherwise it only seeds your local SQLite file, and the deployed
 app won't see the demo account. It's idempotent: re-running it is a no-op
 once the account already has data.
 
@@ -231,7 +231,7 @@ uploads/ vectorstore/ chat_history/    Runtime data (gitignored)
 ```
 
 > **Why `app_pages/` and not `pages/`?**
-> Streamlit treats a top-level `pages/` directory as magic — it auto-generates
+> Streamlit treats a top-level `pages/` directory as magic - it auto-generates
 > its own navigation menu, which would fight with the custom sidebar. Renaming
 > it avoids that conflict entirely.
 
@@ -253,7 +253,7 @@ uploads/ vectorstore/ chat_history/    Runtime data (gitignored)
 | `.env` (Supabase/OpenAI/Gemini/…) | `.env` (OpenRouter only) |
 | React `useState` | `st.session_state` |
 | Hardcoded mock arrays | SQLite (`database/db.py`) |
-| *(no backend existed)* | `services/` — the whole RAG stack |
+| *(no backend existed)* | `services/` - the whole RAG stack |
 
 ---
 
@@ -267,7 +267,7 @@ Everything lives in `config.py`:
 | `chunk_overlap` | 150 | Prevents ideas being split across a boundary |
 | `top_k` | 5 | Chunks sent to the LLM per question |
 | `min_similarity` | 0.25 | **Raise** if you get loose answers; **lower** if it refuses too often |
-| `temperature` | 0.2 | Low on purpose — factual, not creative |
+| `temperature` | 0.2 | Low on purpose - factual, not creative |
 
 ---
 
@@ -276,9 +276,9 @@ Everything lives in `config.py`:
 | Symptom | Fix |
 |---|---|
 | "No OpenRouter API key found" | Add `OPENROUTER_API_KEY` to `.env` or Streamlit Secrets |
-| 401 from OpenRouter | Key is wrong or revoked — regenerate at openrouter.ai/keys |
+| 401 from OpenRouter | Key is wrong or revoked - regenerate at openrouter.ai/keys |
 | 402 from OpenRouter | Out of credits |
-| "No readable text found" | Scanned PDF — it's images, not text. Needs OCR first |
+| "No readable text found" | Scanned PDF - it's images, not text. Needs OCR first |
 | Always says "couldn't find this" | Lower `min_similarity` in `config.py` |
 | Slow first load | One-time embedding model download (~90 MB) |
 | Build fails on Streamlit Cloud | Don't remove the `--extra-index-url` torch line |
@@ -287,7 +287,7 @@ Everything lives in `config.py`:
 
 ## Security
 
-- Keys are read from `.env` / Streamlit Secrets — never hardcoded.
+- Keys are read from `.env` / Streamlit Secrets - never hardcoded.
 - `.env` and `.streamlit/secrets.toml` are gitignored.
 - Only *retrieved chunks* are sent to OpenRouter, never whole documents.
 
